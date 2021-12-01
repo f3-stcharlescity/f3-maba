@@ -8,6 +8,7 @@ export default function ({ store }) {
 			name: "MABA - Signup",
 			component: SignupForm,
 			beforeEnter(to, from, next) {
+				document.title = "MABA - Signup";
 				store.dispatch("signupForm/initializeStore");
 				next();
 			}

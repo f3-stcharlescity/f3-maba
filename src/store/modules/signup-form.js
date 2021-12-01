@@ -1,11 +1,17 @@
 import axios from "axios";
 
+import { isEmailValid } from "@/lib/validation";
+
 const pristineState = () => {
 	return {
 		regions: [],
 		aos: {},
 
 		selectedRegion: "",
+		hasEnteredName: false,
+		name: "",
+		hasEnteredEmail: false,
+		email: "",
 	}
 }
 
@@ -22,7 +28,13 @@ export default {
 			}
 
 			return state.aos[state.selectedRegion];
-		}
+		},
+		hasEnteredName: state => state.hasEnteredName,
+		hasEnteredEmail: state => state.hasEnteredEmail,
+		isNameValid: state => !!state.name.trim(),
+		isEmailValid: state => {
+			return isEmailValid(state.email);
+		},
 	},
 	mutations: {
 		storeInitialized(state, { regions, aos, }) {
@@ -31,6 +43,14 @@ export default {
 		},
 		selectRegion(state, selectedRegion) {
 			state.selectedRegion = selectedRegion;
+		},
+		changeName(state, name) {
+			state.hasEnteredName = true;
+			state.name = name;
+		},
+		changeEmail(state, email) {
+			state.hasEnteredEmail = true;
+			state.email = email;
 		}
 	},
 	actions: {
