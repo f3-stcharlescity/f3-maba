@@ -1,7 +1,7 @@
 <template>
 <div class="submission-form">
-	<header class="subsection">
-		<img src="../assets/banner.png" />
+	<header class="subsection centered">
+		<img src="../assets/banner.png" alt="F3 St. Louis, Fitness, Fellowship, and Faith" />
 	</header>
 	<section class="subsection description">
 		<h1>MABA 2021: Make America Burpee Again</h1>
@@ -46,7 +46,7 @@
 		<p>HC now!</p>
 	</section>
 
-	<section class="subsection">
+	<section class="subsection centered">
 		<iframe
 			width="560"
 			height="315"
@@ -56,12 +56,66 @@
 			allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
 			allowfullscreen></iframe>
 	</section>
+
+	<section class="subsection">
+		<h2>F3 Name</h2>
+		<input type="text" placeholder="e.g., dredd" />
+	</section>
+
+	<section class="subsection">
+		<h2>Region</h2>
+		<select name="regions"
+			v-if="regions.length"
+			@change="onRegionChange"
+		>
+			<option v-for="region in regions" :key="region" :value="region">{{ region }}</option>
+		</select>
+	</section>
+
+	<section class="subsection">
+		<h2>AO (Your main home AO)</h2>
+		<select name="regionAOs"
+				v-if="regionAOs.length"
+		>
+			<option v-for="ao in regionAOs" :key="ao" :value="ao">{{ ao }}</option>
+		</select>
+		<p v-else>(choose a region first)</p>
+	</section>
+
+	<section class="subsection">
+		<h2>Email</h2>
+		<input type="text" placeholder="e.g., dredd@f3nation.com" />
+	</section>
+
+	<section class="subsection">
+		<button>Submit</button>
+	</section>
 </div>
 </template>
 
 <script>
+import { mapGetters, mapMutations } from "vuex";
+
 export default {
-	name: "SubmissionForm"
+	name: "SignupForm",
+	computed: {
+		...mapGetters("signupForm", [
+			"regions",
+			"regionAOs"
+		])
+	},
+	methods: {
+		...mapMutations("signupForm", [
+			"selectRegion"
+		]),
+
+		onRegionChange( e ) {
+			const { target } = e;
+			const { options, selectedIndex } = target;
+			const region = options[selectedIndex].value;
+			this.selectRegion(region);
+		}
+	}
 }
 </script>
 
@@ -72,8 +126,7 @@ export default {
 
 	.subsection {
 		background-color: #ffffff;
-		display: flex;
-		justify-content: center;
+		text-align: left;
 		border: 1px solid silver;
 		border-radius: 8px;
 		overflow: hidden;
@@ -81,9 +134,16 @@ export default {
 		margin-bottom: 1rem;
 	}
 
-	.description {
-		display: block;
-		text-align: left;
+	.subsection.centered {
+		display: flex;
+		justify-content: center;
+	}
+
+	input, select {
+		font-size: 1.2rem;
+		width: 33%;
+		border: 1px solid silver;
+		padding: 0.2rem;
 	}
 }
 </style>
