@@ -1,8 +1,5 @@
 <template>
-	<div class="submission-form">
-		<header class="subsection centered">
-			<img src="../assets/banner.png" alt="F3 St. Louis, Fitness, Fellowship, and Faith"/>
-		</header>
+	<MABAForm>
 		<section class="subsection description">
 			<h1>MABA 2021: Make America Burpee Again</h1>
 
@@ -83,19 +80,25 @@
 					v-if="regions.length"
 					@change="onRegionChange"
 			>
-				<option v-for="region in regions" :key="region" :value="region">{{ region }}</option>
+				<option v-for="region in regions"
+						:key="region"
+						:value="region"
+				>{{ region }}</option>
 			</select>
-		</section>
-
-		<section class="subsection">
-			<h2>AO (Your main home AO)</h2>
-			<select name="regionAOs"
-					v-if="regionAOs.length"
-					:key="regionAOs[0]"
-			>
-				<option v-for="ao in regionAOs" :key="ao" :value="ao">{{ ao }}</option>
-			</select>
-			<p v-else>(choose a region first)</p>
+			<div v-if="canSelectAO">
+				<h2>AO (Your main home AO)</h2>
+				<select name="regionAOs"
+						v-if="regionAOs.length"
+						:key="regionAOs[0]"
+						@change="onAOChange"
+				>
+					<option v-for="ao in regionAOs"
+							:key="ao"
+							:value="ao"
+					>{{ ao }}</option>
+				</select>
+				<p v-else>(choose a region first)</p>
+			</div>
 		</section>
 
 		<section class="subsection">
@@ -104,17 +107,22 @@
 			/>
 		</section>
 
-		<section class="subsection">
+		<section class="subsection spread">
 			<button>Submit</button>
+			<button>Clear form</button>
 		</section>
-	</div>
+	</MABAForm>
 </template>
 
 <script>
 import { mapGetters, mapMutations } from "vuex";
+import MABAForm from "./MABAForm";
 
 export default {
 	name: "SignupForm",
+	components: {
+		MABAForm,
+	},
 	computed: {
 		...mapGetters( "signupForm", [
 			"regions",
@@ -123,6 +131,7 @@ export default {
 			"hasEnteredEmail",
 			"isNameValid",
 			"isEmailValid",
+			"canSelectAO",
 		] ),
 		nameFieldClasses() {
 			if (!this.hasEnteredName) {
@@ -140,6 +149,7 @@ export default {
 	methods: {
 		...mapMutations( "signupForm", [
 			"selectRegion",
+			"selectAO",
 			"changeName",
 			"changeEmail",
 		] ),
@@ -149,6 +159,12 @@ export default {
 			const { options, selectedIndex } = target;
 			const region = options[ selectedIndex ].value;
 			this.selectRegion( region );
+		},
+		onAOChange( e ) {
+			const { target } = e;
+			const { options, selectedIndex } = target;
+			const ao = options[ selectedIndex ].value;
+			this.selectAO( ao );
 		},
 		onNameInput( e ) {
 			this.changeName(e.target.value);
@@ -161,36 +177,5 @@ export default {
 </script>
 
 <style scoped lang="scss">
-.submission-form {
-	width: 770px;
-	margin: auto;
-
-	.subsection {
-		background-color: #ffffff;
-		text-align: left;
-		border: 1px solid silver;
-		border-radius: 8px;
-		overflow: hidden;
-		padding: 1rem;
-		margin-bottom: 1rem;
-	}
-
-	.subsection.centered {
-		display: flex;
-		justify-content: center;
-	}
-
-	input, select {
-		font-size: 1.2rem;
-		width: 33%;
-		border: 1px solid silver;
-		padding: 0.5rem;
-		border-radius: 0.5rem;
-	}
-
-	input.invalid, select.invalid {
-		border: 1px solid #ff4141;
-		outline: none;
-	}
-}
+.signup-form {}
 </style>

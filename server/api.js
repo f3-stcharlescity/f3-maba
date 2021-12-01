@@ -10,9 +10,9 @@ const getRegions = (req, res) => {
 };
 
 module.exports = function (app) {
-	app.get("/dialup", (req, res) => {
+	app.get("/api/dialup", (req, res) => {
 		res.send("dialup is not GeekSquad");
 	});
-	app.get("/aos", getAOs);
-	app.get("/regions", getRegions);
+	app.get("/api/aos", getAOs);
+	app.get("/api/regions", getRegions);
 }

@@ -1,4 +1,5 @@
 {
+  "(NONE)": [ "(NONE)" ],
   "Northwest Hwy": [
     "Base Camp",
     "Base Camp (Winterfell)",
@@ -341,8 +342,8 @@
   ],
   "Pensacola": [
     "F3 Pensacola",
-    "F3pensacola the “Bay” beatdowns",
-    "F3pensacola “the Bay” beatdowns"
+    "F3pensacola the \u201cBay\u201d beatdowns",
+    "F3pensacola \u201cthe Bay\u201d beatdowns"
   ],
   "South Fork": [
     "Maj Pataj",
@@ -968,7 +969,7 @@
   "SF Peninsula": [
     "Cutters",
     "Full House",
-    "F’ruckin @ H1",
+    "F\u2019ruckin @ H1",
     "Hangar 1",
     "Hill-Yeah",
     "Mulva?",
@@ -1002,7 +1003,7 @@
     "Grinder",
     "Grog",
     "HillTop",
-    "Huff’s Springs",
+    "Huff\u2019s Springs",
     "Iron Rail",
     "Judah",
     "Lighthouse",
@@ -1800,7 +1801,7 @@
   "Nashville": [
     "Atlantis",
     "Bomber",
-    "Bragg’s Isle",
+    "Bragg\u2019s Isle",
     "Cruel Hall",
     "Detention",
     "III Pillars",
