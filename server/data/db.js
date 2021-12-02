@@ -1,23 +1,35 @@
 const { Client } = require( "pg" );
 let client = null;
 
-export const setupDB = () => {
-	client = new Client( {
+const isProduction = process.env.NODE_ENV === "production";
+
+const configuration = () => {
+	if (isProduction) {
+		return {
+			connectionString: process.env.DATABASE_URL,
+			ssl: {
+				rejectUnauthorized: false,
+			},
+		};
+	}
+	return {
 		connectionString: process.env.DATABASE_URL,
-		ssl: {
-			rejectUnauthorized: false
-		}
-	} );
+		ssl: false,
+	};
+}
+
+exports.setupDB = () => {
+	client = new Client( configuration() );
 	client.connect();
 };
 
-export const teardownDB = () => {
+exports.teardownDB = () => {
 	if ( client ) {
 		client.end();
 		client = null;
 	}
 };
 
-export const getClient = () => {
+exports.getClient = () => {
 	return client;
 };
