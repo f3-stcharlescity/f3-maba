@@ -1,7 +1,7 @@
 <template>
 <div class="maba-form">
 	<header class="maba-form__header subsection centered">
-		<img src="../assets/banner.png" alt="F3 St. Louis, Fitness, Fellowship, and Faith"/>
+		<img src="../assets/maba-2022-banner.png" alt="F3 St. Louis, Fitness, Fellowship, and Faith"/>
 	</header>
 	<div class="maba-form__content">
 		<slot></slot>
