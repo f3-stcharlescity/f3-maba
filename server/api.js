@@ -1,3 +1,4 @@
+const { v4: uuidv4 } = require("uuid");
 const db = require( "./data/db" );
 const { regions, aos } = require( "./data/locations" );
 const { isEmailValid, isRegionValid, isAOValid } = require( "./validation" );
@@ -11,8 +12,35 @@ const getRegions = ( req, res ) => {
 };
 
 const getHims = async ( req, res ) => {
+	const { query, } = req;
+	// console.info({ params, body, query });
+	const { region = "", ao = "", } = query;
+
+	let sql = [ "select region, ao, f3_name from hims" ];
+	const sqlWhere = [];
+	const sqlParams = [];
+
+	if ( region ) {
+		sqlWhere.push( "region = $1" );
+		sqlParams.push( region );
+
+		// only add ao if there's a region
+		if ( ao ) {
+			sqlWhere.push( "ao = $2" );
+			sqlParams.push( ao );
+		}
+	}
+
+	if ( sqlWhere.length ) {
+		sql = sql.concat( [ "where" ], [ sqlWhere.join( " and " ) ] );
+	}
+
+	sql = sql.concat( [ "order by region, ao, f3_name" ] );
+
+	const sqlQuery = sql.join( " " );
+	console.info( sqlQuery );
 	const client = db.getClient();
-	const dbres = await client.query( "select * from hims;" );
+	const dbres = await client.query( sqlQuery, sqlParams );
 	return res.json( Array.from( dbres.rows ) );
 };
 
@@ -34,14 +62,14 @@ const postHim = async ( req, res ) => {
 
 	const client = db.getClient();
 
-	const himQuery = "select count(*) as hits from hims where region = $1, ao = $2, f3name = $3, email = $4;";
+	const himQuery = "select count(*) as hits from hims where region = $1, ao = $2, f3_name = $3";
 	const himResult = await client.query( himQuery );
 	if ( himResult.rows[ 0 ].hits > 0 ) {
 		return res.status( 409 ).send( "him already exists" );
 	}
 
-	const query = "insert into hims(region, ao, f3name, email) values($1, $2, $3, $4) returning *;";
-	const values = [ region, ao, name, email ];
+	const query = "insert into hims(him_id, region, ao, f3_name) values($1, $2, $3) returning *;";
+	const values = [ uuidv4(), region, ao, name ];
 	const insertResult = await client.query( query, values );
 	return res.status( 201 ).json( insertResult.rows[ 0 ] );
 };

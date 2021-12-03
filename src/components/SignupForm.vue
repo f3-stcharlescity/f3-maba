@@ -70,11 +70,6 @@
 		</section>
 
 		<section class="subsection">
-			<h2>F3 Name</h2>
-			<input type="text" placeholder="e.g., dredd" @input="onNameInput" :class="nameFieldClasses" />
-		</section>
-
-		<section class="subsection">
 			<h2>Region</h2>
 			<select name="regions"
 					v-if="regions.length"
@@ -85,6 +80,8 @@
 						:value="region"
 				>{{ region }}</option>
 			</select>
+			<p v-if="canSelectAO">(or choose NONE if you do not belong to a region)</p>
+
 			<div v-if="canSelectAO">
 				<h2>AO (Your main home AO)</h2>
 				<select name="regionAOs"
@@ -99,12 +96,12 @@
 				</select>
 				<p v-else>(choose a region first)</p>
 			</div>
-		</section>
 
-		<section class="subsection">
+			<h2>F3 Name</h2>
+			<input type="text" placeholder="e.g., dredd" @input="onNameInput" :class="nameFieldClasses" />
+
 			<h2>Email</h2>
-			<input type="text" placeholder="e.g., dredd@f3nation.com" @input="onEmailInput" :class="emailFieldClasses"
-			/>
+			<input type="text" placeholder="e.g., dredd@f3nation.com" @input="onEmailInput" :class="emailFieldClasses" />
 		</section>
 
 		<section class="subsection spread">

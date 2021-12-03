@@ -18,9 +18,9 @@ const configuration = () => {
 	};
 }
 
-exports.setupDB = () => {
+exports.setupDB = async () => {
 	client = new Client( configuration() );
-	client.connect();
+	await client.connect();
 };
 
 exports.teardownDB = () => {

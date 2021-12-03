@@ -45,6 +45,7 @@ export default {
 	mutations: {
 		storeInitialized( state, { regions, aos, } ) {
 			state.regions = regions;
+			state.selectedRegion = regions[ 0 ];
 			state.aos = aos;
 		},
 		selectRegion( state, selectedRegion ) {

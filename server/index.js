@@ -1,9 +1,9 @@
 const express = require( "express" );
+const bodyParser = require( "body-parser" );
 const serveStatic = require( "serve-static" );
 const path = require( "path" );
 const mountAPI = require( "./api" );
-const db = require("./data/db");
-db.setupDB();
+const db = require( "./data/db" );
 
 if ( process.env.NODE_ENV !== "production" ) {
 	console.info( process.env );
@@ -11,13 +11,11 @@ if ( process.env.NODE_ENV !== "production" ) {
 
 const app = express();
 
-// set up the global request error handler
-// eslint-disable-next-line no-unused-vars
-app.use( function ( err, req, res, next) {
-	console.error( err.stack );
-	db.teardownDB(); // TODO: need to do this for all requests :/
-	res.status( 500 ).send( "Something broke!" );
-} );
+// parse the request body
+app.use( bodyParser.urlencoded( {
+	extended: true
+} ) );
+app.use( bodyParser.json() );
 
 // first, set up the API routes
 mountAPI( app );
@@ -32,5 +30,19 @@ app.get( "*", ( req, res ) => {
 	res.sendFile( path.join( distPath, "index.html" ) );
 } );
 
-const port = process.env.PORT;
-app.listen( port );
+// set up the global request error handler
+// eslint-disable-next-line no-unused-vars
+app.use( ( err, req, res, next ) => {
+	console.error( err );
+	db.teardownDB(); // TODO: for each request
+	if ( req.xhr ) {
+		return res.status( 500 ).send( { error: "Something failed!" } );
+	}
+	next( err );
+} );
+
+// start the app
+( async () => {
+	await db.setupDB();
+	app.listen( process.env.PORT );
+} )();
