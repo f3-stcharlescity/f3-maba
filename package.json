@@ -5,10 +5,10 @@
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
-    "watch": "vue-cli-service build --watch",
     "lint": "vue-cli-service lint",
     "postinstall": "npm run build",
-    "start": "node server/index.js"
+    "start": "node server/index.js",
+    "watch": "vue-cli-service build --watch"
   },
   "dependencies": {
     "axios": "^0.24.0",
