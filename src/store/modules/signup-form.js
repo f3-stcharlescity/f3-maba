@@ -80,7 +80,7 @@ export default {
 				return [];
 			}
 
-			return state.aos[ state.selectedRegion ];
+			return state.aos[ state.selectedRegion ] || [];
 		},
 		aoHims: state => state.aoHims,
 		selectedRegion: state => state.selectedRegion,
@@ -204,12 +204,9 @@ export default {
 				selectedRegion = regions[ 0 ] || NONE_REGION;
 				selectedAO = aos[ selectedRegion ][ 0 ] || NONE_AO;
 
-				let hims = [];
-				if ( selectedAO !== NONE_AO ) {
-					const himUrl = `/api/hims?region=${ selectedRegion }&ao=${ selectedAO }`;
-					const himResult = await axios.get( himUrl );
-					hims = himResult.data;
-				}
+				const himUrl = `/api/hims?region=${ selectedRegion }&ao=${ selectedAO }`;
+				const himResult = await axios.get( himUrl );
+				const hims = himResult.data;
 
 				if ( hims.length ) {
 					selectedHimId = hims[ 0 ].him_id;
@@ -251,12 +248,9 @@ export default {
 				let selectedHimId = "";
 				let burpees = pristineBurpees();
 
-				let hims = [];
-				if ( selectedAO !== NONE_AO ) {
-					const himUrl = `/api/hims?region=${ selectedRegion }&ao=${ selectedAO }`;
-					const himResult = await axios.get( himUrl );
-					hims = himResult.data;
-				}
+				const himUrl = `/api/hims?region=${ selectedRegion }&ao=${ selectedAO }`;
+				const himResult = await axios.get( himUrl );
+				const hims = himResult.data;
 
 				if ( hims.length ) {
 					selectedHimId = hims[ 0 ].him_id;
@@ -283,12 +277,9 @@ export default {
 				let selectedHimId = "";
 				let burpees = pristineBurpees();
 
-				let hims = [];
-				if ( selectedAO !== NONE_AO ) {
-					const himUrl = `/api/hims?region=${ selectedRegion }&ao=${ selectedAO }`;
-					const himResult = await axios.get( himUrl );
-					hims = himResult.data;
-				}
+				const himUrl = `/api/hims?region=${ selectedRegion }&ao=${ selectedAO }`;
+				const himResult = await axios.get( himUrl );
+				const hims = himResult.data;
 
 				if ( hims.length ) {
 					selectedHimId = hims[ 0 ].him_id;

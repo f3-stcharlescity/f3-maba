@@ -81,9 +81,9 @@
 				>{{ region }}
 				</option>
 			</select>
-			<p v-if="canSelectAO">(or choose NONE if you do not belong to a region)</p>
+			<p>(or choose NONE if you do not belong to a region)</p>
 
-			<div v-if="canSelectAO">
+			<div>
 				<h2>AO (Your main home AO)</h2>
 				<select name="regionAOs"
 						v-if="regionAOs.length"
@@ -102,7 +102,7 @@
 			<h2>F3 Name</h2>
 			<div class="f3-name-container">
 				<div>
-					<p v-if="realAOSelected && aoHims.length">
+					<p v-if="aoHims.length">
 						<input type="radio"
 							   name="himStatus"
 							   :checked="canCreateHim"
@@ -110,7 +110,7 @@
 						/>
 						I'm brand new to MABA '22!
 					</p>
-					<p v-else-if="realAOSelected && !aoHims.length">There are no previous registrants for the selected
+					<p v-else-if="!aoHims.length">There are no previous registrants for the selected
 						region/AO. Be the first!</p>
 					<input type="text"
 						   placeholder="e.g., dredd"
@@ -126,10 +126,10 @@
 						   :disabled="!canCreateHim"
 					/>
 				</div>
-				<div v-if="realAOSelected && aoHims.length">
+				<div v-if="aoHims.length">
 					<p>- or -</p>
 				</div>
-				<div v-if="realAOSelected && aoHims.length">
+				<div v-if="aoHims.length">
 					<p>
 						<input type="radio"
 							   name="himStatus"

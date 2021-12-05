@@ -80,7 +80,7 @@ export default {
 	}
 
 	div:nth-child(2) {
-		flex: 0 0 2rem;
+		flex: 0 0 1.2rem;
 	}
 }
 
