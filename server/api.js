@@ -41,14 +41,13 @@ const getHims = async ( req, res ) => {
 	sql = sql.concat( [ "order by region, ao, f3_name" ] );
 
 	const sqlQuery = sql.join( " " );
-	console.info( sqlQuery );
 	const client = db.getClient();
 	const dbres = await client.query( sqlQuery, sqlParams );
 	return res.json( Array.from( dbres.rows ) );
 };
 
 const postHim = async ( req, res ) => {
-	const { region, ao, name, email } = req.body;
+	const { region, ao, f3_name, email } = req.body;
 
 	if ( !isRegionValid( region ) ) {
 		return res.status( 400 ).send( "invalid region" );
@@ -59,21 +58,22 @@ const postHim = async ( req, res ) => {
 	if ( !isEmailValid( email ) ) {
 		return res.status( 400 ).send( "invalid email" );
 	}
-	if ( !name.trim() ) {
-		return res.status( 400 ).send( "invalid name" );
+	if ( !f3_name.trim() ) {
+		return res.status( 400 ).send( "invalid F3 name" );
 	}
 
 	const client = db.getClient();
 
-	const himQuery = "select count(*) as hits from hims where region = $1, ao = $2, f3_name = $3";
-	const himResult = await client.query( himQuery );
+	const himQuery = "select count(*) as hits from hims where region = $1 and ao = $2 and f3_name = $3;";
+	const himValues = [ region, ao, f3_name ];
+	const himResult = await client.query( himQuery, himValues );
 	if ( himResult.rows[ 0 ].hits > 0 ) {
 		return res.status( 409 ).send( "him already exists" );
 	}
 
-	const query = "insert into hims(him_id, region, ao, f3_name) values($1, $2, $3) returning *;";
-	const values = [ uuidv4(), region, ao, name ];
-	const insertResult = await client.query( query, values );
+	const insertQuery = "insert into hims (him_id, region, ao, f3_name, email) values ($1, $2, $3, $4, $5) returning *;";
+	const insertValues = [ uuidv4(), region, ao, f3_name, email ];
+	const insertResult = await client.query( insertQuery, insertValues );
 	return res.status( 201 ).json( insertResult.rows[ 0 ] );
 };
 
@@ -134,7 +134,16 @@ const postBurpees = async ( req, res ) => {
 
 	const client = db.getClient();
 	const insertResult = await client.query( insertQuery, values );
-	return res.status( 201 ).json( insertResult.rows );
+
+	const formattedRows = insertResult.rows.map( row => {
+		return {
+			...row,
+			// @see https://node-postgres.com/features/types#date--timestamp--timestamptz
+			date: moment.tz( row.date, process.env.TZ ).format("YYYY-MM-DD"),
+		};
+	} );
+
+	return res.status( 201 ).json( formattedRows );
 };
 
 module.exports = function ( app ) {

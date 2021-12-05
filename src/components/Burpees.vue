@@ -9,7 +9,6 @@
 			</div>
 			<div>
 				<input type="text"
-					   class="invalid"
 					   :value="burpee.count"
 					   @input="onCountChange( burpee.date, $event.target.value )"
 				/>

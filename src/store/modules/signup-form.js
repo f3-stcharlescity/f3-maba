@@ -5,30 +5,38 @@ import { isEmailValid } from "@/lib/validation";
 import { NONE_REGION, NONE_AO } from "@/lib/enum";
 import range from "lodash/range";
 
+const BURPEE_YEAR = 2022;
+
+const HIM_STATUS = {
+	NEW: "NEW",
+	EXISTING: "EXISTING",
+};
+
 const pristineBurpees = () => {
 	const allBurpees = [];
 	const daysInJanuary = 31;
-	const year = 2022;
+	const year = BURPEE_YEAR;
 	const padZero = n => n < 10 ? `0${ n }` : `${ n }`;
 	for ( const day of range( 1, daysInJanuary + 1 ) ) {
 		const date = `${ year }-01-${ padZero( day ) }`;
-		const row = {
+		const burpee = {
 			date,
 			count: 0,
 		};
-		allBurpees.push( row );
+		allBurpees.push( burpee );
 	}
 	return allBurpees;
 };
 
 const pristineState = () => {
 	return {
-		globalError: "",
+		errors: {},
 
 		regions: [],
 		aos: {},
 		aoHims: [],
 
+		himStatus: HIM_STATUS.NEW,
 		hasEnteredName: false,
 		name: "",
 		hasEnteredEmail: false,
@@ -38,6 +46,7 @@ const pristineState = () => {
 		selectedAO: NONE_AO,
 		selectedHimId: "",
 		burpees: pristineBurpees(),
+		modifiedBurpees: {},
 	};
 };
 
@@ -46,6 +55,24 @@ export default {
 
 	state: pristineState(),
 	getters: {
+		errors: key => state => state.errors[ key ] || "",
+		validation: ( state, getters ) => {
+			const validation = {};
+			if ( !getters.canSelectHim ) {
+				if ( !state.name ) {
+					validation.name = "Name is required.";
+				}
+				if ( !isEmailValid( state.email ) ) {
+					validation.email = "A valid email is required.";
+				}
+			}
+			getters.mergedBurpees.forEach( burpee => {
+				if ( isNaN( burpee.count ) ) {
+					validation[ `burpee.${ burpee.date }` ] = `Burpee count for ${ burpee.date } is invalid.`;
+				}
+			} );
+			return validation;
+		},
 		regions: state => state.regions,
 		aos: state => state.aos,
 		regionAOs: state => {
@@ -59,23 +86,25 @@ export default {
 		selectedRegion: state => state.selectedRegion,
 		selectedAO: state => state.selectedAO,
 		burpees: state => state.burpees,
+		mergedBurpees: state => {
+			return state.burpees.map( burpee => {
+				const modifiedCount = state.modifiedBurpees[ burpee.date ] || 0;
+				return {
+					...burpee,
+					count: modifiedCount || burpee.count,
+				};
+			} );
+		},
 		canSelectAO: state => ( state.selectedRegion && state.selectedRegion !== NONE_REGION ),
-		validAOSelected: state => ( state.selectedAO && state.selectedAO !== NONE_AO ),
-		canSelectHim: state => !( state.name || state.email ),
+		realAOSelected: state => ( state.selectedAO && state.selectedAO !== NONE_AO ),
+		selectedHimId: state => state.selectedHimId,
+		himStatus: state => state.himStatus,
+		canSelectHim: state => state.himStatus === HIM_STATUS.EXISTING,
+		canCreateHim: state => state.himStatus === HIM_STATUS.NEW,
 		hasEnteredName: state => state.hasEnteredName,
 		hasEnteredEmail: state => state.hasEnteredEmail,
-		isNameValid: state => !!state.name.trim(),
-		isEmailValid: state => {
-			return isEmailValid( state.email );
-		},
 	},
 	mutations: {
-		setGlobalError( state, error ) {
-			state.globalError = error;
-		},
-		clearGlobalError( state ) {
-			state.globalError = "";
-		},
 		storeInitialized( state, { regions, selectedRegion, aos, selectedAO, hims, selectedHimId, burpees, } ) {
 			Object.assign( state, pristineState() );
 			state.regions = regions;
@@ -110,10 +139,36 @@ export default {
 			state.selectedHimId = selectedHimId;
 			state.burpees = burpees;
 		},
-		himSelected( state, { himId, burpees } ) {
+		himChanged( state, { himId, burpees } ) {
 			state.selectedHimId = himId;
+			state.modifiedBurpees = {};
 			state.burpees = burpees;
 		},
+		himStatusChanged( state, { status, burpees, }) {
+			state.himStatus = status;
+			state.modifiedBurpees = {};
+			state.burpees = burpees;
+		},
+		changeBurpeeCount( state, { date, count, } ) {
+			state.modifiedBurpees = {
+				...state.modifiedBurpees,
+				[ date ]: count,
+			};
+		},
+		burpeesSaved( state, { him, burpees, } ) {
+			state.modifiedBurpees = {};
+			state.burpees = burpees;
+
+			if ( him ) {
+				state.himStatus = HIM_STATUS.EXISTING;
+				state.selectedHimId = him.him_id;
+				const hims = [
+					...state.aoHims.filter( oldHim => oldHim.him_id !== him.him_id ),
+					him,
+				];
+				state.aoHims = orderBy( hims, [ "f3_name", ], [ "asc", ] );
+			}
+		}
 	},
 	actions: {
 		async initializeStore( { commit } ) {
@@ -145,9 +200,9 @@ export default {
 
 				if ( hims.length ) {
 					selectedHimId = hims[ 0 ].him_id;
-					const burpeeUrl = `/api/hims/${ selectedHimId }/burpees?year=2022`;
-					const burpeesResult = await axios.get( burpeeUrl );
-					burpees = burpeesResult.data;
+					// const burpeeUrl = `/api/hims/${ selectedHimId }/burpees?year=${ BURPEE_YEAR }`;
+					// const burpeesResult = await axios.get( burpeeUrl );
+					// burpees = burpeesResult.data;
 				}
 
 				commit( "storeInitialized", {
@@ -192,7 +247,7 @@ export default {
 
 				if ( hims.length ) {
 					selectedHimId = hims[ 0 ].him_id;
-					const burpeeUrl = `/api/hims/${ selectedHimId }/burpees?year=2022`;
+					const burpeeUrl = `/api/hims/${ selectedHimId }/burpees?year=${ BURPEE_YEAR }`;
 					const burpeesResult = await axios.get( burpeeUrl );
 					burpees = burpeesResult.data;
 				}
@@ -224,7 +279,7 @@ export default {
 
 				if ( hims.length ) {
 					selectedHimId = hims[ 0 ].him_id;
-					const burpeeUrl = `/api/hims/${ selectedHimId }/burpees?year=2022`;
+					const burpeeUrl = `/api/hims/${ selectedHimId }/burpees?year=${ BURPEE_YEAR }`;
 					const burpeesResult = await axios.get( burpeeUrl );
 					burpees = burpeesResult.data;
 				}
@@ -241,10 +296,56 @@ export default {
 		},
 		async changeHim( { commit }, himId ) {
 			try {
-				const url = `/api/hims/${ himId }/burpees?year=2022`;
+				const url = `/api/hims/${ himId }/burpees?year=${ BURPEE_YEAR }`;
 				const result = await axios.get( url );
 				const burpees = result.data;
-				commit( "himSelected", { himId, burpees, } );
+				commit( "himChanged", { himId, burpees, } );
+			} catch ( e ) {
+				console.error( e );
+			}
+		},
+		async changeHimStatus( { state, commit }, status ) {
+			try {
+				let burpees = pristineBurpees();
+				const { selectedHimId, } = state;
+
+				if ( status === HIM_STATUS.EXISTING && selectedHimId ) {
+					const url = `/api/hims/${ selectedHimId }/burpees?year=${ BURPEE_YEAR }`;
+					const result = await axios.get( url );
+					burpees = result.data;
+				}
+
+				commit( "himStatusChanged", {
+					status,
+					burpees,
+
+				} );
+			} catch ( e ) {
+				console.error( e );
+			}
+		},
+		async save( { state, getters, commit, } ) {
+			const isNewUser = !getters.canSelectHim;
+			let { selectedHimId } = state;
+			let him = null;
+
+			try {
+				if ( isNewUser ) {
+					const { name, email, selectedRegion, selectedAO, } = state;
+					const body = { f3_name: name, email, region: selectedRegion, ao: selectedAO };
+					const himResult = await axios.post( "/api/hims", body );
+					him = himResult.data;
+					selectedHimId = him.him_id;
+				}
+
+				const burpeeURL = `/api/hims/${ selectedHimId }/burpees`;
+				const { mergedBurpees } = getters;
+				const burpeeResult = await axios.post( burpeeURL, mergedBurpees );
+
+				commit( "burpeesSaved", {
+					him,
+					burpees: burpeeResult.data,
+				} );
 			} catch ( e ) {
 				console.error( e );
 			}

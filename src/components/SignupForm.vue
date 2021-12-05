@@ -101,8 +101,43 @@
 
 			<h2>F3 Name</h2>
 			<div class="f3-name-container">
-				<div v-if="validAOSelected && aoHims.length">
-					<p>I've done this before</p>
+				<div>
+					<p v-if="realAOSelected && aoHims.length">
+						<input type="radio"
+							   name="himStatus"
+							   :checked="canCreateHim"
+							   @input="onHimStatusChange( `NEW` )"
+						/>
+						I'm brand new to MABA '22!
+					</p>
+					<p v-else-if="realAOSelected && !aoHims.length">There are no previous registrants for the selected
+						region/AO. Be the first!</p>
+					<input type="text"
+						   placeholder="e.g., dredd"
+						   @input="onNameInput"
+						   :class="nameFieldClasses"
+						   :disabled="!canCreateHim"
+					/>
+					<h3>Email</h3>
+					<input type="text"
+						   placeholder="e.g., dredd@f3nation.com"
+						   @input="onEmailInput"
+						   :class="emailFieldClasses"
+						   :disabled="!canCreateHim"
+					/>
+				</div>
+				<div v-if="realAOSelected && aoHims.length">
+					<p>- or -</p>
+				</div>
+				<div v-if="realAOSelected && aoHims.length">
+					<p>
+						<input type="radio"
+							   name="himStatus"
+							   :checked="canSelectHim"
+							   @input="onHimStatusChange( `EXISTING` )"
+						/>
+						Bah, I've done this before.
+					</p>
 					<select name="aoHims"
 							:key="aoHims[ 0 ]?.him_id"
 							:disabled="!canSelectHim"
@@ -111,35 +146,24 @@
 						<option v-for="him in aoHims"
 								:key="him.him_id"
 								:value="him.him_id"
+								:selected="him.him_id === selectedHimId"
 						>{{ him.f3_name }}
 						</option>
 					</select>
 				</div>
-				<div v-if="validAOSelected && aoHims.length">
-					<p>- or -</p>
-				</div>
-				<div>
-					<p v-if="validAOSelected && aoHims.length">I'm brand new</p>
-					<p v-else-if="validAOSelected && !aoHims.length">There are no previous registrants for the selected
-						region/AO. Be the first!</p>
-					<input type="text" placeholder="e.g., dredd" @input="onNameInput" :class="nameFieldClasses"/>
-					<h3>Email</h3>
-					<input type="text" placeholder="e.g., dredd@f3nation.com" @input="onEmailInput"
-						   :class="emailFieldClasses"/>
-				</div>
 			</div>
 		</section>
 
-		<section class="subsection" v-if="burpees.length">
+		<section class="subsection" v-if="mergedBurpees.length">
 			<h2>Burpees</h2>
-			<Burpees :burpees="burpees"
+			<Burpees :burpees="mergedBurpees"
 					 @change="onBurpeesChanged"
 			/>
 		</section>
 
 		<section class="subsection spread">
-			<button>Submit</button>
-			<button>Clear form</button>
+			<button @click="onSubmitForm">Submit</button>
+			<button @click="onClearForm">Clear form</button>
 		</section>
 	</MABAForm>
 </template>
@@ -157,41 +181,49 @@ export default {
 	},
 	computed: {
 		...mapGetters( "signupForm", [
+			"errors",
+			"validation",
 			"regions",
 			"regionAOs",
 			"aoHims",
 			"hasEnteredName",
 			"hasEnteredEmail",
-			"isNameValid",
-			"isEmailValid",
 			"canSelectAO",
-			"validAOSelected",
-			"burpees",
+			"realAOSelected",
+			"mergedBurpees",
 			"canSelectHim",
+			"canCreateHim",
+			"himStatus",
+			"selectedHimId",
 		] ),
 		nameFieldClasses() {
+			const { name: nameHasError, } = this.validation;
 			if ( !this.hasEnteredName ) {
 				return "";
 			}
-			return this.isNameValid ? "" : "invalid";
+			return nameHasError ? "invalid" : "";
 		},
 		emailFieldClasses() {
+			const { email: emailHasError, } = this.validation;
 			if ( !this.hasEnteredEmail ) {
 				return "";
 			}
-			return this.isEmailValid ? "" : "invalid";
+			return emailHasError ? "invalid" : "";
 		},
 	},
 	methods: {
 		...mapMutations( "signupForm", [
 			"changeName",
 			"changeEmail",
+			"changeBurpeeCount",
 		] ),
 		...mapActions( "signupForm", [
 			"refreshAOHims",
 			"changeRegion",
 			"changeAO",
 			"changeHim",
+			"save",
+			"changeHimStatus",
 		] ),
 		onRegionChange( e ) {
 			const { target } = e;
@@ -217,14 +249,21 @@ export default {
 		onEmailInput( e ) {
 			this.changeEmail( e.target.value );
 		},
+		onHimStatusChange( status ) {
+			this.changeHimStatus( status );
+		},
 		onBurpeesChanged( e ) {
-			console.info( "onBurpeesChanged", e );
+			this.changeBurpeeCount( {
+				date: e.date,
+				count: e.count,
+			} );
 		},
-		onSubmitForm() {
-
+		onSubmitForm( e ) {
+			e.preventDefault();
+			this.save();
 		},
-		onClearForm() {
-
+		onClearForm( e ) {
+			e.preventDefault();
 		},
 	}
 };
