@@ -5,7 +5,7 @@ import { isEmailValid } from "@/lib/validation";
 import { NONE_REGION, NONE_AO } from "@/lib/enum";
 import range from "lodash/range";
 
-const pristineBurpees = ( ) => {
+const pristineBurpees = () => {
 	const allBurpees = [];
 	const daysInJanuary = 31;
 	const year = 2022;
@@ -60,7 +60,8 @@ export default {
 		selectedAO: state => state.selectedAO,
 		burpees: state => state.burpees,
 		canSelectAO: state => ( state.selectedRegion && state.selectedRegion !== NONE_REGION ),
-		canSelectHim: state => ( state.selectedAO && state.selectedAO !== NONE_AO ),
+		validAOSelected: state => ( state.selectedAO && state.selectedAO !== NONE_AO ),
+		canSelectHim: state => !( state.name || state.email ),
 		hasEnteredName: state => state.hasEnteredName,
 		hasEnteredEmail: state => state.hasEnteredEmail,
 		isNameValid: state => !!state.name.trim(),

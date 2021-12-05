@@ -101,10 +101,11 @@
 
 			<h2>F3 Name</h2>
 			<div class="f3-name-container">
-				<div v-if="canSelectHim && aoHims.length">
+				<div v-if="validAOSelected && aoHims.length">
 					<p>I've done this before</p>
 					<select name="aoHims"
 							:key="aoHims[ 0 ]?.him_id"
+							:disabled="!canSelectHim"
 							@change="onAOHimChange"
 					>
 						<option v-for="him in aoHims"
@@ -114,12 +115,12 @@
 						</option>
 					</select>
 				</div>
-				<div v-if="canSelectHim && aoHims.length">
+				<div v-if="validAOSelected && aoHims.length">
 					<p>- or -</p>
 				</div>
 				<div>
-					<p v-if="canSelectHim && aoHims.length">I'm brand new</p>
-					<p v-else-if="canSelectHim && !aoHims.length">There are no previous registrants for the selected
+					<p v-if="validAOSelected && aoHims.length">I'm brand new</p>
+					<p v-else-if="validAOSelected && !aoHims.length">There are no previous registrants for the selected
 						region/AO. Be the first!</p>
 					<input type="text" placeholder="e.g., dredd" @input="onNameInput" :class="nameFieldClasses"/>
 					<h3>Email</h3>
@@ -164,8 +165,9 @@ export default {
 			"isNameValid",
 			"isEmailValid",
 			"canSelectAO",
-			"canSelectHim",
+			"validAOSelected",
 			"burpees",
+			"canSelectHim",
 		] ),
 		nameFieldClasses() {
 			if ( !this.hasEnteredName ) {
