@@ -86,6 +86,11 @@ export default {
 		selectedRegion: state => state.selectedRegion,
 		selectedAO: state => state.selectedAO,
 		burpees: state => state.burpees,
+		totalBurpees: ( state, getters ) => {
+			return getters.mergedBurpees.reduce( ( total, burpee ) => {
+				return total + burpee.count;
+			}, 0 );
+		},
 		mergedBurpees: state => {
 			return state.burpees.map( burpee => {
 				const modifiedCount = state.modifiedBurpees[ burpee.date ] || 0;
@@ -132,19 +137,27 @@ export default {
 			state.aoHims = hims;
 			state.selectedHimId = selectedHimId;
 			state.burpees = burpees;
+
+			if ( hims.length === 0 ) {
+				state.himStatus = HIM_STATUS.NEW;
+			}
 		},
 		aoChanged( state, { selectedAO, hims, selectedHimId, burpees, } ) {
 			state.selectedAO = selectedAO;
 			state.aoHims = hims;
 			state.selectedHimId = selectedHimId;
 			state.burpees = burpees;
+
+			if ( hims.length === 0 ) {
+				state.himStatus = HIM_STATUS.NEW;
+			}
 		},
 		himChanged( state, { himId, burpees } ) {
 			state.selectedHimId = himId;
 			state.modifiedBurpees = {};
 			state.burpees = burpees;
 		},
-		himStatusChanged( state, { status, burpees, }) {
+		himStatusChanged( state, { status, burpees, } ) {
 			state.himStatus = status;
 			state.modifiedBurpees = {};
 			state.burpees = burpees;

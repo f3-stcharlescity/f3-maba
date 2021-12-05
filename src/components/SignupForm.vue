@@ -155,7 +155,7 @@
 		</section>
 
 		<section class="subsection" v-if="mergedBurpees.length">
-			<h2>Burpees</h2>
+			<h2>Burpees ({{ totalBurpees }})</h2>
 			<Burpees :burpees="mergedBurpees"
 					 @change="onBurpeesChanged"
 			/>
@@ -195,6 +195,7 @@ export default {
 			"canCreateHim",
 			"himStatus",
 			"selectedHimId",
+			"totalBurpees",
 		] ),
 		nameFieldClasses() {
 			const { name: nameHasError, } = this.validation;

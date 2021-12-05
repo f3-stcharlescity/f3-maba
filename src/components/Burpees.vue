@@ -1,17 +1,36 @@
 <template>
 	<div class="burpees">
-		<div v-for="burpee in burpees"
-			 :key="`burpees-${ burpee.date }`"
-			 class="burpees-by-date"
-		>
-			<div>
-				<p>{{ burpee.date }}</p>
+		<div>
+			<div v-for="burpee in leftBurpees"
+				 :key="`burpees-${ burpee.date }`"
+				 class="burpees-by-date"
+			>
+				<div>
+					<p>{{ burpee.date }}</p>
+				</div>
+				<div>
+					<input type="text"
+						   :value="burpee.count"
+						   @input="onCountChange( burpee.date, $event.target.value )"
+					/>
+				</div>
 			</div>
-			<div>
-				<input type="text"
-					   :value="burpee.count"
-					   @input="onCountChange( burpee.date, $event.target.value )"
-				/>
+		</div>
+		<div>&nbsp;</div>
+		<div>
+			<div v-for="burpee in rightBurpees"
+				 :key="`burpees-${ burpee.date }`"
+				 class="burpees-by-date"
+			>
+				<div>
+					<p>{{ burpee.date }}</p>
+				</div>
+				<div>
+					<input type="text"
+						   :value="burpee.count"
+						   @input="onCountChange( burpee.date, $event.target.value )"
+					/>
+				</div>
 			</div>
 		</div>
 	</div>
@@ -30,6 +49,14 @@ export default {
 			required: true,
 		}
 	},
+	computed: {
+		leftBurpees() {
+			return this.burpees.slice(0, 15);
+		},
+		rightBurpees() {
+			return this.burpees.slice(15)
+		},
+	},
 	methods: {
 		onCountChange( date, count ) {
 			this.$emit( "change", {
@@ -43,7 +70,22 @@ export default {
 </script>
 
 <style scoped lang="scss">
+.burpees {
+	display: flex;
+	flex-direction: row;
+	justify-content: flex-start;
+
+	div:first-child, div:last-child {
+		flex: 1;
+	}
+
+	div:nth-child(2) {
+		flex: 0 0 2rem;
+	}
+}
+
 .burpees-by-date {
+	flex: 1;
 	display: flex;
 	flex-direction: row;
 	justify-content: flex-start;
