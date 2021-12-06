@@ -7,7 +7,7 @@
 				take days off. Other than that, there are no rules. Clap at the top, don’t clap the top, either is fine.
 				100 of anything is a lot for one day, so push yourself but don’t hurt yourself.</p>
 
-			<p>The theme this year is Fall Down. Get back up. Together. We all fall down. We all get back up. We must
+			<p>The theme is Fall Down. Get back up. Together. We all fall down. We all get back up. We must
 				not do either one alone.</p>
 
 			<p>Sign up below.</p>
