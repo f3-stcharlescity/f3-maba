@@ -113,7 +113,10 @@
 		</section>
 
 		<section class="subsection" v-if="mergedBurpees.length">
-			<h2>Burpees ({{ totalBurpees }})</h2>
+			<h2 class="burpees-heading">
+				<span>Burpees</span>
+				<span>Total: {{ totalBurpees }}</span>
+			</h2>
 			<Burpees :burpees="mergedBurpees"
 					 @change="onBurpeesChanged"
 			/>
@@ -261,5 +264,11 @@ export default {
 		font-weight: bold;
 		font-style: italic;
 	}
+}
+
+.burpees-heading {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
 }
 </style>
