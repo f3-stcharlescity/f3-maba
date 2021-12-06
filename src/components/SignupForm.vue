@@ -38,7 +38,7 @@
 				>{{ region }}
 				</option>
 			</select>
-			<p>(or choose NONE if you do not belong to a region)</p>
+			<p><em>Choose NONE if you are not a member of F3.</em></p>
 
 			<div>
 				<h2>AO (Your main home AO)</h2>
@@ -57,6 +57,7 @@
 			</div>
 
 			<h2>F3 Name</h2>
+			<p><em>Use your first and last name if you are not an F3 member.</em></p>
 			<div class="f3-name-container">
 				<div>
 					<p v-if="aoHims.length">
