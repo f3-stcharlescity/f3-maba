@@ -1,3 +1,4 @@
+import { notify } from "@kyvg/vue3-notification";
 import axios from "axios";
 import orderBy from "lodash/orderBy";
 
@@ -10,6 +11,34 @@ const BURPEE_YEAR = 2022;
 const HIM_STATUS = {
 	NEW: "NEW",
 	EXISTING: "EXISTING",
+};
+
+const notifySuccess = ( text ) => {
+	notify( {
+		text,
+		type: "success"
+	} );
+};
+
+const notifyInfo = ( text ) => {
+	notify( {
+		text,
+		type: "info"
+	} );
+};
+
+const notifyError = ( text, e = null ) => {
+	if ( e ) {
+		console.error( e );
+	}
+	notify( {
+		text: text || ( e ? e.message : "" ) || "",
+		type: "error"
+	} );
+};
+
+const notifyUnknownError = ( e ) => {
+	notifyError( "An unknown error has occurred. Please refresh the page and try again.", e );
 };
 
 const pristineBurpees = () => {
@@ -30,8 +59,6 @@ const pristineBurpees = () => {
 
 const pristineState = () => {
 	return {
-		errors: {},
-
 		regions: [],
 		aos: {},
 		aoHims: [],
@@ -55,14 +82,13 @@ export default {
 
 	state: pristineState(),
 	getters: {
-		errors: key => state => state.errors[ key ] || "",
 		validation: ( state, getters ) => {
 			const validation = {};
 			if ( !getters.canSelectHim ) {
-				if ( !state.name ) {
+				if ( !state.name.trim() ) {
 					validation.name = "Name is required.";
 				}
-				if ( !isEmailValid( state.email ) ) {
+				if ( !isEmailValid( state.email.trim() ) ) {
 					validation.email = "A valid email is required.";
 				}
 			}
@@ -93,15 +119,16 @@ export default {
 		},
 		mergedBurpees: state => {
 			return state.burpees.map( burpee => {
-				const modifiedCount = state.modifiedBurpees[ burpee.date ] || 0;
+				const hasModifiedCount = state.modifiedBurpees.hasOwnProperty( burpee.date );
+				const modifiedCount = state.modifiedBurpees[ burpee.date ];
 				return {
 					...burpee,
-					count: modifiedCount || burpee.count,
+					count: hasModifiedCount ? modifiedCount : burpee.count,
+					// ignore modifications that are identical
+					isModified: hasModifiedCount && modifiedCount !== burpee.count,
 				};
 			} );
 		},
-		canSelectAO: state => ( state.selectedRegion && state.selectedRegion !== NONE_REGION ),
-		realAOSelected: state => ( state.selectedAO && state.selectedAO !== NONE_AO ),
 		selectedHimId: state => state.selectedHimId,
 		himStatus: state => state.himStatus,
 		canSelectHim: state => state.himStatus === HIM_STATUS.EXISTING,
@@ -181,7 +208,12 @@ export default {
 				];
 				state.aoHims = orderBy( hims, [ "f3_name", ], [ "asc", ] );
 			}
-		}
+
+			notifySuccess( "Burpees updated." );
+		},
+		resetBurpees( state ) {
+			state.modifiedBurpees = {};
+		},
 	},
 	actions: {
 		async initializeStore( { commit } ) {
@@ -225,7 +257,47 @@ export default {
 					burpees,
 				} );
 			} catch ( e ) {
-				console.error( e );
+				notifyUnknownError( e );
+			}
+		},
+		async resetStore( { state, commit } ) {
+			try {
+				let selectedHimId = "";
+				let burpees = pristineBurpees();
+
+				const regions = [
+					...state.regions,
+				];
+
+				const aos = {
+					...state.aos,
+				};
+
+				const selectedRegion = regions[ 0 ] || NONE_REGION;
+				const selectedAO = aos[ selectedRegion ][ 0 ] || NONE_AO;
+
+				const himUrl = `/api/hims?region=${ selectedRegion }&ao=${ selectedAO }`;
+				const himResult = await axios.get( himUrl );
+				const hims = himResult.data;
+
+				if ( hims.length ) {
+					selectedHimId = hims[ 0 ].him_id;
+					// const burpeeUrl = `/api/hims/${ selectedHimId }/burpees?year=${ BURPEE_YEAR }`;
+					// const burpeesResult = await axios.get( burpeeUrl );
+					// burpees = burpeesResult.data;
+				}
+
+				commit( "storeInitialized", {
+					regions,
+					selectedRegion,
+					aos,
+					selectedAO,
+					hims,
+					selectedHimId,
+					burpees,
+				} );
+			} catch ( e ) {
+				notifyUnknownError( e );
 			}
 		},
 		async refreshAOHims( { state, commit } ) {
@@ -238,7 +310,7 @@ export default {
 				const result = await axios.get( url );
 				commit( "aoHimsFetched", result.data );
 			} catch ( e ) {
-				console.error( e );
+				notifyUnknownError( e );
 			}
 		},
 		async changeRegion( { state, commit }, region ) {
@@ -267,7 +339,7 @@ export default {
 					burpees,
 				} );
 			} catch ( e ) {
-				console.error( e );
+				notifyUnknownError( e );
 			}
 		},
 		async changeAO( { state, commit }, ao ) {
@@ -295,7 +367,7 @@ export default {
 					burpees,
 				} );
 			} catch ( e ) {
-				console.error( e );
+				notifyUnknownError( e );
 			}
 		},
 		async changeHim( { commit }, himId ) {
@@ -305,7 +377,7 @@ export default {
 				const burpees = result.data;
 				commit( "himChanged", { himId, burpees, } );
 			} catch ( e ) {
-				console.error( e );
+				notifyUnknownError( e );
 			}
 		},
 		async changeHimStatus( { state, commit }, status ) {
@@ -325,7 +397,7 @@ export default {
 
 				} );
 			} catch ( e ) {
-				console.error( e );
+				notifyUnknownError( e );
 			}
 		},
 		async save( { state, getters, commit, } ) {
@@ -335,8 +407,15 @@ export default {
 
 			try {
 				if ( isNewUser ) {
+					const { validation } = getters;
+					if ( validation.name ) {
+						return notifyInfo( validation.name );
+					}
+					if ( validation.email ) {
+						return notifyInfo( validation.email );
+					}
 					const { name, email, selectedRegion, selectedAO, } = state;
-					const body = { f3_name: name, email, region: selectedRegion, ao: selectedAO };
+					const body = { f3_name: name.trim(), email: email.trim(), region: selectedRegion, ao: selectedAO };
 					const himResult = await axios.post( "/api/hims", body );
 					him = himResult.data;
 					selectedHimId = him.him_id;
@@ -351,7 +430,12 @@ export default {
 					burpees: burpeeResult.data,
 				} );
 			} catch ( e ) {
-				console.error( e );
+				const { data, status } = e?.response || { data: "", status: 0, };
+				if ( status === 400 ) {
+					notifyError( `An error occurred saving your Burpee counts: ${ data || "unknown." }`, e );
+				} else {
+					notifyError( "An error occurred saving your Burpee counts. Please refresh the page and try again.", e );
+				}
 			}
 		},
 	},

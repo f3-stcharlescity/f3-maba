@@ -6,6 +6,7 @@
 	</div>
 	-->
 	<router-view />
+	<notifications />
 </template>
 
 <script>

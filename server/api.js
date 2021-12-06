@@ -50,16 +50,16 @@ const postHim = async ( req, res ) => {
 	const { region, ao, f3_name, email } = req.body;
 
 	if ( !isRegionValid( region ) ) {
-		return res.status( 400 ).send( "invalid region" );
+		return res.status( 400 ).send( "Invalid region." );
 	}
 	if ( !isAOValid( region, ao ) ) {
-		return res.status( 400 ).send( "invalid ao" );
+		return res.status( 400 ).send( "Invalid AO." );
 	}
 	if ( !isEmailValid( email ) ) {
-		return res.status( 400 ).send( "invalid email" );
+		return res.status( 400 ).send( "Invalid email." );
 	}
 	if ( !f3_name.trim() ) {
-		return res.status( 400 ).send( "invalid F3 name" );
+		return res.status( 400 ).send( "Invalid F3 name." );
 	}
 
 	const client = db.getClient();
@@ -68,7 +68,7 @@ const postHim = async ( req, res ) => {
 	const himValues = [ region, ao, f3_name ];
 	const himResult = await client.query( himQuery, himValues );
 	if ( himResult.rows[ 0 ].hits > 0 ) {
-		return res.status( 409 ).send( "him already exists" );
+		return res.status( 409 ).send( "HIM already exists." );
 	}
 
 	const insertQuery = "insert into hims (him_id, region, ao, f3_name, email) values ($1, $2, $3, $4, $5) returning *;";

@@ -3,7 +3,8 @@
 		<section class="subsection description">
 			<h1>Welcome to Year 2 of MABA — Make America Burpee Again.</h1>
 
-			<p><strong>The challenge:</strong> Do 3,100 burpees in January. You can do 100 every single day, or you can bank a bunch and
+			<p><strong>The challenge:</strong> Do 3,100 burpees in January. You can do 100 every single day, or you can
+				bank a bunch and
 				take days off. Other than that, there are no rules. Clap at the top, don’t clap the top, either is fine.
 				100 of anything is a lot for one day, so push yourself but don’t hurt yourself.</p>
 
@@ -30,6 +31,7 @@
 			<h2>Region</h2>
 			<select name="regions"
 					v-if="regions.length"
+					:value="selectedRegion"
 					@change="onRegionChange"
 			>
 				<option v-for="region in regions"
@@ -44,6 +46,7 @@
 				<h2>AO (Your main home AO)</h2>
 				<select name="regionAOs"
 						v-if="regionAOs.length"
+						:value="selectedAO"
 						:key="regionAOs[0]"
 						@change="onAOChange"
 				>
@@ -98,6 +101,7 @@
 					</p>
 					<select name="aoHims"
 							:key="aoHims[ 0 ]?.him_id"
+							:value="selectedHimId"
 							:disabled="!canSelectHim"
 							@change="onAOHimChange"
 					>
@@ -122,9 +126,12 @@
 			/>
 		</section>
 
-		<section class="subsection spread">
+		<section class="subsection spread buttons">
 			<button @click="onSubmitForm">Submit</button>
-			<button @click="onClearForm">Clear form</button>
+			<span>
+				<button @click="onResetBurpees">Reset burpees ONLY</button>
+				<button @click="onResetForm">Reset form</button>
+			</span>
 		</section>
 	</MABAForm>
 </template>
@@ -142,21 +149,20 @@ export default {
 	},
 	computed: {
 		...mapGetters( "signupForm", [
-			"errors",
 			"validation",
 			"regions",
 			"regionAOs",
 			"aoHims",
 			"hasEnteredName",
 			"hasEnteredEmail",
-			"canSelectAO",
-			"realAOSelected",
 			"mergedBurpees",
 			"canSelectHim",
 			"canCreateHim",
 			"himStatus",
 			"selectedHimId",
 			"totalBurpees",
+			"selectedRegion",
+			"selectedAO",
 		] ),
 		nameFieldClasses() {
 			const { name: nameHasError, } = this.validation;
@@ -178,6 +184,7 @@ export default {
 			"changeName",
 			"changeEmail",
 			"changeBurpeeCount",
+			"resetBurpees",
 		] ),
 		...mapActions( "signupForm", [
 			"refreshAOHims",
@@ -186,6 +193,7 @@ export default {
 			"changeHim",
 			"save",
 			"changeHimStatus",
+			"resetStore",
 		] ),
 		onRegionChange( e ) {
 			const { target } = e;
@@ -215,17 +223,21 @@ export default {
 			this.changeHimStatus( status );
 		},
 		onBurpeesChanged( e ) {
+			const { date, newCount } = e;
 			this.changeBurpeeCount( {
-				date: e.date,
-				count: e.count,
+				date,
+				count: newCount,
 			} );
 		},
 		onSubmitForm( e ) {
 			e.preventDefault();
 			this.save();
 		},
-		onClearForm( e ) {
-			e.preventDefault();
+		onResetBurpees() {
+			this.resetBurpees();
+		},
+		onResetForm() {
+			this.resetStore();
 		},
 	}
 };
@@ -270,5 +282,15 @@ export default {
 	display: flex;
 	flex-direction: row;
 	justify-content: space-between;
+}
+
+.buttons {
+	button {
+		margin-right: 1rem;
+	}
+
+	button:last-of-type {
+		margin-right: 0;
+	}
 }
 </style>

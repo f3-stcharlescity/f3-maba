@@ -3,15 +3,16 @@
 		<div>
 			<div v-for="burpee in leftBurpees"
 				 :key="`burpees-${ burpee.date }`"
-				 class="burpees-by-date"
+				 class="burpee-by-date"
 			>
 				<div>
 					<p>{{ burpee.date }}</p>
 				</div>
 				<div>
 					<input type="text"
+						   :class="burpeeCountClasses( burpee )"
 						   :value="burpee.count"
-						   @input="onCountChange( burpee.date, $event.target.value )"
+						   @input="onCountChange( burpee, $event.target.value )"
 					/>
 				</div>
 			</div>
@@ -20,15 +21,16 @@
 		<div>
 			<div v-for="burpee in rightBurpees"
 				 :key="`burpees-${ burpee.date }`"
-				 class="burpees-by-date"
+				 class="burpee-by-date"
 			>
 				<div>
 					<p>{{ burpee.date }}</p>
 				</div>
 				<div>
 					<input type="text"
+						   :class="burpeeCountClasses( burpee )"
 						   :value="burpee.count"
-						   @input="onCountChange( burpee.date, $event.target.value )"
+						   @input="onCountChange( burpee, $event.target.value )"
 					/>
 				</div>
 			</div>
@@ -51,17 +53,24 @@ export default {
 	},
 	computed: {
 		leftBurpees() {
-			return this.burpees.slice(0, 15);
+			return this.burpees.slice( 0, 15 );
 		},
 		rightBurpees() {
-			return this.burpees.slice(15)
+			return this.burpees.slice( 15 );
 		},
 	},
 	methods: {
-		onCountChange( date, count ) {
+		burpeeCountClasses( burpee ) {
+			return {
+				"burpee-count": true,
+				"burpee-count--modified": burpee.isModified,
+			};
+		},
+		onCountChange( burpee, count ) {
 			this.$emit( "change", {
-				date,
-				count: parseInt( count, 10 ),
+				date: burpee.date,
+				oldCount: burpee.count,
+				newCount: parseInt( count, 10 ) || 0,
 			} );
 		}
 	},
@@ -84,7 +93,7 @@ export default {
 	}
 }
 
-.burpees-by-date {
+.burpee-by-date {
 	flex: 1;
 	display: flex;
 	flex-direction: row;
@@ -118,5 +127,11 @@ export default {
 	div:last-child {
 		padding-right: 0;
 	}
+}
+
+.burpee-count--modified {
+	outline: none;
+	background-color: black;
+	color: white;
 }
 </style>
