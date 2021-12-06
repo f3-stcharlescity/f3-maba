@@ -1,6 +1,5 @@
 import {createRouter, createWebHistory} from "vue-router";
 import SignupForm from "@/components/SignupForm.vue";
-import SubmitForm from "@/components/SubmitForm.vue";
 
 export default function ({ store }) {
 	const routes = [
@@ -19,16 +18,6 @@ export default function ({ store }) {
 				next();
 			}
 		},
-		{
-			path: "/submit",
-			name: "submit",
-			component: SubmitForm,
-			beforeEnter(to, from, next) {
-				document.title = "MABA - Submit Burpees";
-				store.dispatch("submitForm/initializeStore");
-				next();
-			}
-		}
 	];
 
 	return createRouter({
