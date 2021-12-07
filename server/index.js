@@ -5,11 +5,24 @@ const path = require( "path" );
 const mountAPI = require( "./api" );
 const db = require( "./data/db" );
 
-if ( process.env.NODE_ENV !== "production" ) {
+const isProductionEnvironment = process.env.NODE_ENV === "production";
+
+if ( !isProductionEnvironment ) {
 	console.info( process.env );
 }
 
 const app = express();
+
+// @see https://jaketrent.com/post/https-redirect-node-heroku
+if ( isProductionEnvironment ) {
+	app.use( ( req, res, next ) => {
+		if ( req.header( "x-forwarded-proto" ) !== "https" ) {
+			res.redirect( `https://${ req.header( "host" ) }${ req.url }` );
+		} else {
+			next();
+		}
+	} );
+}
 
 // parse the request body
 app.use( bodyParser.urlencoded( {
