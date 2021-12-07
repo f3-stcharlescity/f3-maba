@@ -150,19 +150,7 @@ export default {
 			state.hims = hims;
 			state.selectedHimId = selectedHimId;
 			state.burpees = burpees;
-
-			if ( hims.length === 0 ) {
-				state.himStatus = HIM_STATUS.NEW;
-			}
-		},
-		aoChanged( state, { hims, selectedHimId, burpees, } ) {
-			state.hims = hims;
-			state.selectedHimId = selectedHimId;
-			state.burpees = burpees;
-
-			if ( hims.length === 0 ) {
-				state.himStatus = HIM_STATUS.NEW;
-			}
+			state.himStatus = HIM_STATUS.NEW;
 		},
 		himChanged( state, { himId, burpees } ) {
 			state.selectedHimId = himId;

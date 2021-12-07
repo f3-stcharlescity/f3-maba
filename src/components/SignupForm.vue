@@ -101,7 +101,7 @@
 
 		<section class="subsection" v-if="mergedBurpees.length">
 			<h2 class="burpees-heading">
-				<span>Burpees</span>
+				<span>2022 Burpees</span>
 				<span>Total: {{ totalBurpees }}</span>
 			</h2>
 			<Burpees :burpees="mergedBurpees"
@@ -134,7 +134,6 @@ export default {
 		...mapGetters( "signupForm", [
 			"validation",
 			"regions",
-			"regionAOs",
 			"hims",
 			"hasEnteredName",
 			"hasEnteredEmail",
@@ -145,7 +144,6 @@ export default {
 			"selectedHimId",
 			"totalBurpees",
 			"selectedRegion",
-			"selectedAO",
 		] ),
 		nameFieldClasses() {
 			const { name: nameHasError, } = this.validation;
@@ -172,7 +170,6 @@ export default {
 		...mapActions( "signupForm", [
 			"refreshHims",
 			"changeRegion",
-			"changeAO",
 			"changeHim",
 			"save",
 			"changeHimStatus",
@@ -183,12 +180,6 @@ export default {
 			const { options, selectedIndex } = target;
 			const region = options[ selectedIndex ].value;
 			this.changeRegion( region );
-		},
-		onAOChange( e ) {
-			const { target } = e;
-			const { options, selectedIndex } = target;
-			const ao = options[ selectedIndex ].value;
-			this.changeAO( ao );
 		},
 		onAOHimChange( e ) {
 			const { target } = e;

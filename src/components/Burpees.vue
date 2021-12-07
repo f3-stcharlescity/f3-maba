@@ -5,7 +5,7 @@
 				 :key="`burpees-${ burpee.date }`"
 				 class="burpee-by-date"
 			>
-				<p class="burpee-date">{{ burpee.date }}</p>
+				<p class="burpee-date">{{ burpee.formattedDate }}</p>
 
 				<input type="text"
 					   :class="burpeeCountClasses( burpee )"
@@ -21,7 +21,7 @@
 				 :key="`burpees-${ burpee.date }`"
 				 class="burpee-by-date"
 			>
-				<p class="burpee-date">{{ burpee.date }}</p>
+				<p class="burpee-date">{{ burpee.formattedDate }}</p>
 
 				<input type="text"
 					   :class="burpeeCountClasses( burpee )"
@@ -35,6 +35,8 @@
 </template>
 
 <script>
+import moment from "moment-timezone";
+
 export default {
 	name: "Burpees",
 	emits: [ "change", ],
@@ -48,11 +50,19 @@ export default {
 		}
 	},
 	computed: {
+		formattedBurpees() {
+			return this.burpees.map( burpee => {
+				return {
+					...burpee,
+					formattedDate: moment( burpee.date ).format( "MMM D" )
+				};
+			} );
+		},
 		leftBurpees() {
-			return this.burpees.slice( 0, 15 );
+			return this.formattedBurpees.slice( 0, 15 );
 		},
 		rightBurpees() {
-			return this.burpees.slice( 15 );
+			return this.formattedBurpees.slice( 15 );
 		},
 	},
 	methods: {
@@ -105,7 +115,6 @@ export default {
 	}
 
 	input {
-		//width: auto;
 		flex: 1;
 	}
 
@@ -117,7 +126,7 @@ export default {
 
 	p {
 		line-height: 1rem;
-		font-weight: bold;
+
 	}
 
 	div:first-child {
@@ -131,6 +140,7 @@ export default {
 
 .burpee-date {
 	padding-right: 1rem;
+	font-weight: bold;
 }
 
 .burpee-count--modified {
