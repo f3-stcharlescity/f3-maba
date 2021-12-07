@@ -63,6 +63,9 @@ export default {
 			};
 		},
 		onCountChange( burpee, count ) {
+			if ( !count.trim() ) {
+				return;
+			}
 			this.$emit( "change", {
 				date: burpee.date,
 				oldCount: burpee.count,

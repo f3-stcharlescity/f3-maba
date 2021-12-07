@@ -29,6 +29,7 @@
 
 		<section class="subsection">
 			<h2>Region</h2>
+			<p><em>Choose NONE if you are not an F3 member.</em></p>
 			<select name="regions"
 					v-if="regions.length"
 					:value="selectedRegion"
@@ -40,38 +41,20 @@
 				>{{ region }}
 				</option>
 			</select>
-			<p><em>Choose NONE if you are not a member of F3.</em></p>
-
-			<div>
-				<h2>AO (Your main home AO)</h2>
-				<select name="regionAOs"
-						v-if="regionAOs.length"
-						:value="selectedAO"
-						:key="regionAOs[0]"
-						@change="onAOChange"
-				>
-					<option v-for="ao in regionAOs"
-							:key="ao"
-							:value="ao"
-					>{{ ao }}
-					</option>
-				</select>
-				<p v-else>(choose a region first)</p>
-			</div>
 
 			<h2>F3 Name</h2>
 			<p><em>Use your first and last name if you are not an F3 member.</em></p>
 			<div class="f3-name-container">
 				<div>
-					<p v-if="aoHims.length">
+					<p v-if="hims.length">
 						<input type="radio"
 							   name="himStatus"
 							   :checked="canCreateHim"
 							   @input="onHimStatusChange( `NEW` )"
 						/>
-						I'm brand new to MABA '22!
+						Sign up
 					</p>
-					<p v-else-if="!aoHims.length">There are no previous registrants for the selected
+					<p v-else-if="!hims.length">There are no previous registrants for the selected
 						region/AO. Be the first!</p>
 					<input type="text"
 						   placeholder="e.g., dredd"
@@ -87,25 +70,25 @@
 						   :disabled="!canCreateHim"
 					/>
 				</div>
-				<div v-if="aoHims.length">
+				<div v-if="hims.length">
 					<p>- or -</p>
 				</div>
-				<div v-if="aoHims.length">
+				<div v-if="hims.length">
 					<p>
 						<input type="radio"
 							   name="himStatus"
 							   :checked="canSelectHim"
 							   @input="onHimStatusChange( `EXISTING` )"
 						/>
-						Bah, I've done this before.
+						Input new burpees
 					</p>
-					<select name="aoHims"
-							:key="aoHims[ 0 ]?.him_id"
+					<select name="hims"
+							:key="hims[ 0 ]?.him_id"
 							:value="selectedHimId"
 							:disabled="!canSelectHim"
 							@change="onAOHimChange"
 					>
-						<option v-for="him in aoHims"
+						<option v-for="him in hims"
 								:key="him.him_id"
 								:value="him.him_id"
 								:selected="him.him_id === selectedHimId"
@@ -152,7 +135,7 @@ export default {
 			"validation",
 			"regions",
 			"regionAOs",
-			"aoHims",
+			"hims",
 			"hasEnteredName",
 			"hasEnteredEmail",
 			"mergedBurpees",
@@ -187,7 +170,7 @@ export default {
 			"resetBurpees",
 		] ),
 		...mapActions( "signupForm", [
-			"refreshAOHims",
+			"refreshHims",
 			"changeRegion",
 			"changeAO",
 			"changeHim",

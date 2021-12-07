@@ -60,8 +60,7 @@ const pristineBurpees = () => {
 const pristineState = () => {
 	return {
 		regions: [],
-		aos: {},
-		aoHims: [],
+		hims: [],
 
 		himStatus: HIM_STATUS.NEW,
 		hasEnteredName: false,
@@ -70,7 +69,6 @@ const pristineState = () => {
 		email: "",
 
 		selectedRegion: NONE_REGION,
-		selectedAO: NONE_AO,
 		selectedHimId: "",
 		burpees: pristineBurpees(),
 		modifiedBurpees: {},
@@ -100,17 +98,8 @@ export default {
 			return validation;
 		},
 		regions: state => state.regions,
-		aos: state => state.aos,
-		regionAOs: state => {
-			if ( !state.selectedRegion ) {
-				return [];
-			}
-
-			return state.aos[ state.selectedRegion ] || [];
-		},
-		aoHims: state => state.aoHims,
+		hims: state => state.hims,
 		selectedRegion: state => state.selectedRegion,
-		selectedAO: state => state.selectedAO,
 		burpees: state => state.burpees,
 		totalBurpees: ( state, getters ) => {
 			return getters.mergedBurpees.reduce( ( total, burpee ) => {
@@ -137,18 +126,16 @@ export default {
 		hasEnteredEmail: state => state.hasEnteredEmail,
 	},
 	mutations: {
-		storeInitialized( state, { regions, selectedRegion, aos, selectedAO, hims, selectedHimId, burpees, } ) {
+		storeInitialized( state, { regions, selectedRegion, hims, selectedHimId, burpees, } ) {
 			Object.assign( state, pristineState() );
 			state.regions = regions;
 			state.selectedRegion = selectedRegion;
-			state.aos = aos;
-			state.selectedAO = selectedAO;
-			state.aoHims = hims;
+			state.hims = hims;
 			state.selectedHimId = selectedHimId;
 			state.burpees = burpees;
 		},
-		aoHimsFetched( state, hims ) {
-			state.aoHims = orderBy( hims, [ "f3_name", ], [ "asc", ] );
+		himsFetched( state, hims ) {
+			state.hims = orderBy( hims, [ "f3_name", ], [ "asc", ] );
 		},
 		changeName( state, name ) {
 			state.hasEnteredName = true;
@@ -158,10 +145,9 @@ export default {
 			state.hasEnteredEmail = true;
 			state.email = email;
 		},
-		regionChanged( state, { selectedRegion, selectedAO, hims, selectedHimId, burpees, } ) {
+		regionChanged( state, { selectedRegion, hims, selectedHimId, burpees, } ) {
 			state.selectedRegion = selectedRegion;
-			state.selectedAO = selectedAO;
-			state.aoHims = hims;
+			state.hims = hims;
 			state.selectedHimId = selectedHimId;
 			state.burpees = burpees;
 
@@ -169,9 +155,8 @@ export default {
 				state.himStatus = HIM_STATUS.NEW;
 			}
 		},
-		aoChanged( state, { selectedAO, hims, selectedHimId, burpees, } ) {
-			state.selectedAO = selectedAO;
-			state.aoHims = hims;
+		aoChanged( state, { hims, selectedHimId, burpees, } ) {
+			state.hims = hims;
 			state.selectedHimId = selectedHimId;
 			state.burpees = burpees;
 
@@ -203,10 +188,10 @@ export default {
 				state.himStatus = HIM_STATUS.EXISTING;
 				state.selectedHimId = him.him_id;
 				const hims = [
-					...state.aoHims.filter( oldHim => oldHim.him_id !== him.him_id ),
+					...state.hims.filter( oldHim => oldHim.him_id !== him.him_id ),
 					him,
 				];
-				state.aoHims = orderBy( hims, [ "f3_name", ], [ "asc", ] );
+				state.hims = orderBy( hims, [ "f3_name", ], [ "asc", ] );
 			}
 
 			notifySuccess( "Burpees updated." );
@@ -219,24 +204,20 @@ export default {
 		async initializeStore( { commit } ) {
 			try {
 				let selectedRegion = NONE_REGION;
-				let selectedAO = NONE_AO;
 				let selectedHimId = "";
 				let burpees = pristineBurpees();
 
-				const [ regions, aos, ] = await Promise.all( [
+				const [ regions, ] = await Promise.all( [
 					axios.get( "/api/regions" ),
-					axios.get( "/api/aos" ),
 				] ).then( responses => {
 					return [
 						responses[ 0 ].data,
-						responses[ 1 ].data
 					];
 				} );
 
 				selectedRegion = regions[ 0 ] || NONE_REGION;
-				selectedAO = aos[ selectedRegion ][ 0 ] || NONE_AO;
 
-				const himUrl = `/api/hims?region=${ selectedRegion }&ao=${ selectedAO }`;
+				const himUrl = `/api/hims?region=${ selectedRegion }`;
 				const himResult = await axios.get( himUrl );
 				const hims = himResult.data;
 
@@ -250,8 +231,6 @@ export default {
 				commit( "storeInitialized", {
 					regions,
 					selectedRegion,
-					aos,
-					selectedAO,
 					hims,
 					selectedHimId,
 					burpees,
@@ -269,14 +248,9 @@ export default {
 					...state.regions,
 				];
 
-				const aos = {
-					...state.aos,
-				};
-
 				const selectedRegion = regions[ 0 ] || NONE_REGION;
-				const selectedAO = aos[ selectedRegion ][ 0 ] || NONE_AO;
 
-				const himUrl = `/api/hims?region=${ selectedRegion }&ao=${ selectedAO }`;
+				const himUrl = `/api/hims?region=${ selectedRegion }`;
 				const himResult = await axios.get( himUrl );
 				const hims = himResult.data;
 
@@ -290,8 +264,6 @@ export default {
 				commit( "storeInitialized", {
 					regions,
 					selectedRegion,
-					aos,
-					selectedAO,
 					hims,
 					selectedHimId,
 					burpees,
@@ -300,15 +272,14 @@ export default {
 				notifyUnknownError( e );
 			}
 		},
-		async refreshAOHims( { state, commit } ) {
+		async refreshHims( { state, commit } ) {
 			try {
-				const { selectedRegion: region, selectedAO: ao } = state;
+				const { selectedRegion: region, } = state;
 				const params = [];
 				if ( region ) params.push( `region=${ region }` );
-				if ( ao ) params.push( `ao=${ ao }` );
 				const url = `/api/hims?${ params.join( "&" ) }`;
 				const result = await axios.get( url );
-				commit( "aoHimsFetched", result.data );
+				commit( "himsFetched", result.data );
 			} catch ( e ) {
 				notifyUnknownError( e );
 			}
@@ -316,11 +287,10 @@ export default {
 		async changeRegion( { state, commit }, region ) {
 			try {
 				let selectedRegion = region;
-				let selectedAO = state.aos[ region ][ 0 ];
 				let selectedHimId = "";
 				let burpees = pristineBurpees();
 
-				const himUrl = `/api/hims?region=${ selectedRegion }&ao=${ selectedAO }`;
+				const himUrl = `/api/hims?region=${ selectedRegion }`;
 				const himResult = await axios.get( himUrl );
 				const hims = himResult.data;
 
@@ -333,35 +303,6 @@ export default {
 
 				commit( "regionChanged", {
 					selectedRegion,
-					selectedAO,
-					hims,
-					selectedHimId,
-					burpees,
-				} );
-			} catch ( e ) {
-				notifyUnknownError( e );
-			}
-		},
-		async changeAO( { state, commit }, ao ) {
-			try {
-				const { selectedRegion, } = state;
-				let selectedAO = ao;
-				let selectedHimId = "";
-				let burpees = pristineBurpees();
-
-				const himUrl = `/api/hims?region=${ selectedRegion }&ao=${ selectedAO }`;
-				const himResult = await axios.get( himUrl );
-				const hims = himResult.data;
-
-				if ( hims.length ) {
-					selectedHimId = hims[ 0 ].him_id;
-					const burpeeUrl = `/api/hims/${ selectedHimId }/burpees?year=${ BURPEE_YEAR }`;
-					const burpeesResult = await axios.get( burpeeUrl );
-					burpees = burpeesResult.data;
-				}
-
-				commit( "aoChanged", {
-					selectedAO,
 					hims,
 					selectedHimId,
 					burpees,
@@ -415,7 +356,7 @@ export default {
 						return notifyInfo( validation.email );
 					}
 					const { name, email, selectedRegion, selectedAO, } = state;
-					const body = { f3_name: name.trim(), email: email.trim(), region: selectedRegion, ao: selectedAO };
+					const body = { f3_name: name.trim(), email: email.trim(), region: selectedRegion, };
 					const himResult = await axios.post( "/api/hims", body );
 					him = himResult.data;
 					selectedHimId = him.him_id;

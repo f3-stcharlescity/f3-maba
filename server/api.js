@@ -3,12 +3,8 @@ const moment = require("moment-timezone");
 const range = require("lodash/range");
 const keyBy = require("lodash/keyBy");
 const db = require( "./data/db" );
-const { regions, aos } = require( "./data/locations" );
-const { isEmailValid, isRegionValid, isAOValid } = require( "./validation" );
-
-const getAOs = ( req, res ) => {
-	res.json( aos );
-};
+const { regions } = require( "./data/locations" );
+const { isEmailValid, isRegionValid } = require( "./validation" );
 
 const getRegions = ( req, res ) => {
 	res.json( regions );
@@ -17,7 +13,7 @@ const getRegions = ( req, res ) => {
 const getHims = async ( req, res ) => {
 	const { query, } = req;
 	// console.info({ params, body, query });
-	const { region = "", ao = "", } = query;
+	const { region = "", } = query;
 
 	let sql = [ "select him_id, region, ao, f3_name from hims" ];
 	const sqlWhere = [];
@@ -26,19 +22,13 @@ const getHims = async ( req, res ) => {
 	if ( region ) {
 		sqlWhere.push( "region = $1" );
 		sqlParams.push( region );
-
-		// only add ao if there's a region
-		if ( ao ) {
-			sqlWhere.push( "ao = $2" );
-			sqlParams.push( ao );
-		}
 	}
 
 	if ( sqlWhere.length ) {
 		sql = sql.concat( [ "where" ], [ sqlWhere.join( " and " ) ] );
 	}
 
-	sql = sql.concat( [ "order by region, ao, f3_name" ] );
+	sql = sql.concat( [ "order by region, f3_name" ] );
 
 	const sqlQuery = sql.join( " " );
 	const client = db.getClient();
@@ -47,13 +37,10 @@ const getHims = async ( req, res ) => {
 };
 
 const postHim = async ( req, res ) => {
-	const { region, ao, f3_name, email } = req.body;
+	const { region, f3_name, email } = req.body;
 
 	if ( !isRegionValid( region ) ) {
 		return res.status( 400 ).send( "Invalid region." );
-	}
-	if ( !isAOValid( region, ao ) ) {
-		return res.status( 400 ).send( "Invalid AO." );
 	}
 	if ( !isEmailValid( email ) ) {
 		return res.status( 400 ).send( "Invalid email." );
@@ -64,15 +51,15 @@ const postHim = async ( req, res ) => {
 
 	const client = db.getClient();
 
-	const himQuery = "select count(*) as hits from hims where region = $1 and ao = $2 and f3_name = $3;";
-	const himValues = [ region, ao, f3_name ];
+	const himQuery = "select count(*) as hits from hims where region = $1 and f3_name = $2;";
+	const himValues = [ region, f3_name ];
 	const himResult = await client.query( himQuery, himValues );
 	if ( himResult.rows[ 0 ].hits > 0 ) {
 		return res.status( 409 ).send( "HIM already exists." );
 	}
 
 	const insertQuery = "insert into hims (him_id, region, ao, f3_name, email) values ($1, $2, $3, $4, $5) returning *;";
-	const insertValues = [ uuidv4(), region, ao, f3_name, email ];
+	const insertValues = [ uuidv4(), region, "", f3_name, email ];
 	const insertResult = await client.query( insertQuery, insertValues );
 	return res.status( 201 ).json( insertResult.rows[ 0 ] );
 };
@@ -147,7 +134,6 @@ const postBurpees = async ( req, res ) => {
 };
 
 module.exports = function ( app ) {
-	app.get( "/api/aos", getAOs );
 	app.get( "/api/regions", getRegions );
 	app.get( "/api/hims", getHims );
 	app.post( "/api/hims", postHim );
