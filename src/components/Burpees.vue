@@ -139,6 +139,7 @@ export default {
 }
 
 .burpee-date {
+	flex: 0 0 3.5rem;
 	padding-right: 1rem;
 	font-weight: bold;
 }
