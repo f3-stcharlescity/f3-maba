@@ -5,16 +5,14 @@
 				 :key="`burpees-${ burpee.date }`"
 				 class="burpee-by-date"
 			>
-				<div>
-					<p>{{ burpee.date }}</p>
-				</div>
-				<div>
-					<input type="text"
-						   :class="burpeeCountClasses( burpee )"
-						   :value="burpee.count"
-						   @input="onCountChange( burpee, $event.target.value )"
-					/>
-				</div>
+				<p class="burpee-date">{{ burpee.date }}</p>
+
+				<input type="text"
+					   :class="burpeeCountClasses( burpee )"
+					   :value="burpee.count"
+					   @input="onCountChange( burpee, $event.target.value )"
+				/>
+
 			</div>
 		</div>
 		<div>&nbsp;</div>
@@ -23,16 +21,14 @@
 				 :key="`burpees-${ burpee.date }`"
 				 class="burpee-by-date"
 			>
-				<div>
-					<p>{{ burpee.date }}</p>
-				</div>
-				<div>
-					<input type="text"
-						   :class="burpeeCountClasses( burpee )"
-						   :value="burpee.count"
-						   @input="onCountChange( burpee, $event.target.value )"
-					/>
-				</div>
+				<p class="burpee-date">{{ burpee.date }}</p>
+
+				<input type="text"
+					   :class="burpeeCountClasses( burpee )"
+					   :value="burpee.count"
+					   @input="onCountChange( burpee, $event.target.value )"
+				/>
+
 			</div>
 		</div>
 	</div>
@@ -106,7 +102,8 @@ export default {
 	}
 
 	input {
-		width: auto;
+		//width: auto;
+		flex: 1;
 	}
 
 	div {
@@ -127,6 +124,10 @@ export default {
 	div:last-child {
 		padding-right: 0;
 	}
+}
+
+.burpee-date {
+	padding-right: 1rem;
 }
 
 .burpee-count--modified {
