@@ -51,11 +51,11 @@ const postHim = async ( req, res ) => {
 
 	const client = db.getClient();
 
-	const himQuery = "select count(*) as hits from hims where region = $1 and f3_name = $2;";
-	const himValues = [ region, f3_name ];
+	const himQuery = "select count(*) as hits from hims where region = $1 and lower(f3_name) = $2;";
+	const himValues = [ region, f3_name.toLowerCase() ];
 	const himResult = await client.query( himQuery, himValues );
 	if ( himResult.rows[ 0 ].hits > 0 ) {
-		return res.status( 409 ).send( "HIM already exists." );
+		return res.status( 409 ).send( `${ f3_name } has already signed up.` );
 	}
 
 	const insertQuery = "insert into hims (him_id, region, ao, f3_name, email) values ($1, $2, $3, $4, $5) returning *;";
@@ -137,7 +137,6 @@ module.exports = function ( app ) {
 	app.get( "/api/regions", getRegions );
 	app.get( "/api/hims", getHims );
 	app.post( "/api/hims", postHim );
-	// app.post( "/api/burpees", postBurpees );
 	app.get( "/api/hims/:himId/burpees", getBurpees );
 	app.post( "/api/hims/:himId/burpees", postBurpees );
 };

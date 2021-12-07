@@ -365,7 +365,7 @@ export default {
 				} );
 			} catch ( e ) {
 				const { data, status } = e?.response || { data: "", status: 0, };
-				if ( status === 400 ) {
+				if ( status >= 400 && status < 500 ) {
 					notifyError( `An error occurred saving your Burpee counts: ${ data || "unknown." }`, e );
 				} else {
 					notifyError( "An error occurred saving your Burpee counts. Please refresh the page and try again.", e );
