@@ -47,12 +47,15 @@
 			<div class="f3-name-container">
 				<div>
 					<p v-if="hims.length">
-						<input type="radio"
-							   name="himStatus"
-							   :checked="canCreateHim"
-							   @input="onHimStatusChange( `NEW` )"
-						/>
-						Sign up
+						<label for="sign-up-option">
+							<input type="radio"
+								   id="sign-up-option"
+								   name="himStatus"
+								   :checked="canCreateHim"
+								   @input="onHimStatusChange( `NEW` )"
+							/>
+							Sign up
+						</label>
 					</p>
 					<p v-else-if="!hims.length">There are no previous registrants for the selected
 						region/AO. Be the first!</p>
@@ -75,12 +78,15 @@
 				</div>
 				<div v-if="hims.length">
 					<p>
-						<input type="radio"
-							   name="himStatus"
-							   :checked="canSelectHim"
-							   @input="onHimStatusChange( `EXISTING` )"
-						/>
-						Input new burpees
+						<label for="new-burpees-option">
+							<input type="radio"
+								   id="new-burpees-option"
+								   name="himStatus"
+								   :checked="canSelectHim"
+								   @input="onHimStatusChange( `EXISTING` )"
+							/>
+							Input new burpees
+						</label>
 					</p>
 					<select name="hims"
 							:key="hims[ 0 ]?.him_id"
@@ -101,7 +107,8 @@
 
 		<section class="subsection" v-if="mergedBurpees.length">
 			<h2 class="burpees-heading">
-				<span>2022 Burpees</span>
+				<span v-if="himName">2022 Burpees for {{ himName }}</span>
+				<span v-else>2022 Burpees</span>
 				<span>Total: {{ totalBurpees }}</span>
 			</h2>
 			<Burpees :burpees="mergedBurpees"
@@ -144,6 +151,7 @@ export default {
 			"selectedHimId",
 			"totalBurpees",
 			"selectedRegion",
+			"himName",
 		] ),
 		nameFieldClasses() {
 			const { name: nameHasError, } = this.validation;
@@ -249,6 +257,10 @@ export default {
 		align-content: center;
 		font-weight: bold;
 		font-style: italic;
+	}
+
+	label {
+		cursor: pointer;
 	}
 }
 

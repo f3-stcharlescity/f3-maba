@@ -119,6 +119,16 @@ export default {
 			} );
 		},
 		selectedHimId: state => state.selectedHimId,
+		himName: state => {
+			if ( state.himStatus === HIM_STATUS.NEW ) {
+				return state.name;
+			}
+			const selectedHim = state.hims.find( him => him.him_id === state.selectedHimId );
+			if ( !selectedHim ) {
+				return "";
+			}
+			return selectedHim.f3_name;
+		},
 		himStatus: state => state.himStatus,
 		canSelectHim: state => state.himStatus === HIM_STATUS.EXISTING,
 		canCreateHim: state => state.himStatus === HIM_STATUS.NEW,
@@ -151,6 +161,7 @@ export default {
 			state.selectedHimId = selectedHimId;
 			state.burpees = burpees;
 			state.himStatus = HIM_STATUS.NEW;
+			state.modifiedBurpees = {};
 		},
 		himChanged( state, { himId, burpees } ) {
 			state.selectedHimId = himId;
@@ -244,9 +255,6 @@ export default {
 
 				if ( hims.length ) {
 					selectedHimId = hims[ 0 ].him_id;
-					// const burpeeUrl = `/api/hims/${ selectedHimId }/burpees?year=${ BURPEE_YEAR }`;
-					// const burpeesResult = await axios.get( burpeeUrl );
-					// burpees = burpeesResult.data;
 				}
 
 				commit( "storeInitialized", {
@@ -284,9 +292,6 @@ export default {
 
 				if ( hims.length ) {
 					selectedHimId = hims[ 0 ].him_id;
-					const burpeeUrl = `/api/hims/${ selectedHimId }/burpees?year=${ BURPEE_YEAR }`;
-					const burpeesResult = await axios.get( burpeeUrl );
-					burpees = burpeesResult.data;
 				}
 
 				commit( "regionChanged", {
