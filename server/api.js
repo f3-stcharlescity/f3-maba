@@ -1,9 +1,9 @@
 const { v4: uuidv4 } = require( "uuid" );
-const moment = require("moment-timezone");
-const range = require("lodash/range");
-const keyBy = require("lodash/keyBy");
+const moment = require( "moment-timezone" );
+const range = require( "lodash/range" );
+const keyBy = require( "lodash/keyBy" );
 const db = require( "./data/db" );
-const { regions } = require( "./data/locations" );
+const regions = require( "./data/regions.json" );
 const { isEmailValid, isRegionValid } = require( "./validation" );
 
 const getRegions = ( req, res ) => {
@@ -77,13 +77,13 @@ const getBurpees = async ( req, res ) => {
 		const allBurpees = [];
 		const daysInJanuary = 31;
 		const padZero = n => n < 10 ? `0${ n }` : `${ n }`;
-		for ( const day of range(1, daysInJanuary + 1 )) {
-			const date = `${ year }-01-${ padZero( day )}`;
-			const row = rowsByDate[date] || {
+		for ( const day of range( 1, daysInJanuary + 1 ) ) {
+			const date = `${ year }-01-${ padZero( day ) }`;
+			const row = rowsByDate[ date ] || {
 				date,
 				count: 0,
 			};
-			allBurpees.push(row);
+			allBurpees.push( row );
 		}
 		return allBurpees;
 	};
@@ -101,11 +101,11 @@ const getBurpees = async ( req, res ) => {
 		return {
 			...row,
 			// @see https://node-postgres.com/features/types#date--timestamp--timestamptz
-			date: moment.tz( row.date, process.env.TZ ).format("YYYY-MM-DD"),
+			date: moment.tz( row.date, process.env.TZ ).format( "YYYY-MM-DD" ),
 		};
 	} );
 
-	const allBurpees = zeroFillBurpees( formattedRows )
+	const allBurpees = zeroFillBurpees( formattedRows );
 
 	return res.status( 200 ).json( allBurpees );
 };
@@ -134,7 +134,7 @@ const postBurpees = async ( req, res ) => {
 		return {
 			...row,
 			// @see https://node-postgres.com/features/types#date--timestamp--timestamptz
-			date: moment.tz( row.date, process.env.TZ ).format("YYYY-MM-DD"),
+			date: moment.tz( row.date, process.env.TZ ).format( "YYYY-MM-DD" ),
 		};
 	} );
 
