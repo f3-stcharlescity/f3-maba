@@ -22,12 +22,12 @@ exports.setupDB = async () => {
 	if ( pool ) {
 		const _pool = pool;
 		pool = null;
-		_pool.end();
+		await _pool.end();
 	}
 
 	// @see https://node-postgres.com/api/client
 	// @see https://node-postgres.com/api/pool
-	pool = new Pool( configuration() );
+	pool = await new Pool( configuration() );
 
 	if ( !isProduction ) {
 		pool.on( "acquire", () => {
@@ -50,7 +50,7 @@ exports.teardownDB = async () => {
 	if ( pool ) {
 		const _pool = pool;
 		pool = null;
-		_pool.end();
+		await _pool.end();
 	}
 };
 

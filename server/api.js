@@ -32,8 +32,11 @@ const getHims = async ( req, res ) => {
 
 	const sqlQuery = sql.join( " " );
 	const client = await db.getClient();
-	const dbres = await client.query( sqlQuery, sqlParams );
-	return res.json( Array.from( dbres.rows ) );
+	const himsResult = await client.query( sqlQuery, sqlParams );
+
+	client.release( true );
+
+	return res.json( Array.from( himsResult.rows ) );
 };
 
 const postHim = async ( req, res ) => {
@@ -61,6 +64,9 @@ const postHim = async ( req, res ) => {
 	const insertQuery = "insert into hims (him_id, region, ao, f3_name, email) values ($1, $2, $3, $4, $5) returning *;";
 	const insertValues = [ uuidv4(), region, "", f3_name, email ];
 	const insertResult = await client.query( insertQuery, insertValues );
+
+	client.release( true );
+
 	return res.status( 201 ).json( insertResult.rows[ 0 ] );
 };
 
@@ -89,6 +95,7 @@ const getBurpees = async ( req, res ) => {
 	const values = [ himId, year ];
 	const client = await db.getClient();
 	const result = await client.query( query, values );
+	client.release( true );
 
 	const formattedRows = result.rows.map( row => {
 		return {
@@ -121,6 +128,7 @@ const postBurpees = async ( req, res ) => {
 
 	const client = await db.getClient();
 	const insertResult = await client.query( insertQuery, values );
+	client.release( true );
 
 	const formattedRows = insertResult.rows.map( row => {
 		return {

@@ -51,6 +51,7 @@ app.use( ( err, req, res, next ) => {
 } );
 
 process.on( "SIGINT", async () => {
+	console.info( "server is shutting down..." );
 	await db.teardownDB();
 	process.exit( 0 );
 } );
