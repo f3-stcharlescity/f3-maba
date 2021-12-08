@@ -88,10 +88,16 @@ export default {
 </script>
 
 <style scoped lang="scss">
+@import "../assets/styles/styles";
+
 .burpees {
 	display: flex;
-	flex-direction: row;
+	flex-direction: column;
 	justify-content: flex-start;
+
+	@include media-tablet() {
+		flex-direction: row;
+	}
 
 	div:first-child, div:last-child {
 		flex: 1;

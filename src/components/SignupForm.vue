@@ -74,7 +74,7 @@
 					/>
 				</div>
 				<div v-if="hims.length">
-					<p>- or -</p>
+					<h3>- OR -</h3>
 				</div>
 				<div v-if="hims.length">
 					<p>
@@ -117,11 +117,13 @@
 		</section>
 
 		<section class="subsection spread buttons">
-			<button @click="onSubmitForm">Submit</button>
-			<span>
+			<div class="buttons--left">
+				<button @click="onSubmitForm">Submit</button>
+			</div>
+			<div class="buttons--right">
 				<button @click="onResetBurpees">Reset burpees ONLY</button>
 				<button @click="onResetForm">Reset form</button>
-			</span>
+			</div>
 		</section>
 	</MABAForm>
 </template>
@@ -226,13 +228,16 @@ export default {
 </script>
 
 <style scoped lang="scss">
-.signup-form {
-}
+@import "../assets/styles/styles";
 
 .f3-name-container {
 	width: 100%;
 	display: flex;
-	flex-direction: row;
+	flex-direction: column;
+
+	@include media-tablet() {
+		flex-direction: row;
+	}
 
 	div {
 		display: flex;
@@ -258,25 +263,36 @@ export default {
 		font-weight: bold;
 		font-style: italic;
 	}
-
-	label {
-		cursor: pointer;
-	}
 }
 
 .burpees-heading {
 	display: flex;
-	flex-direction: row;
+	flex-direction: column;
 	justify-content: space-between;
+
+	@include media-tablet() {
+		flex-direction: row;
+	}
 }
 
-.buttons {
+.buttons--left, .buttons--right {
+	display: flex;
+	flex-direction: column;
+
 	button {
-		margin-right: 1rem;
+		margin-top: 1rem;
 	}
 
-	button:last-of-type {
-		margin-right: 0;
+	@include media-tablet() {
+		flex-direction: row;
+
+		button {
+			margin-top: 0;
+			margin-right: 1rem;
+			&:last-of-type {
+				margin-right: 0;
+			}
+		}
 	}
 }
 </style>

@@ -5,17 +5,19 @@
 		<router-link to="/about">About</router-link>
 	</div>
 	-->
-	<router-view />
-	<notifications />
+	<router-view/>
+	<notifications/>
 </template>
 
 <script>
 export default {
-	name: 'App',
-}
+	name: "App",
+};
 </script>
 
 <style lang="scss">
+@import "./assets/styles/styles.scss";
+
 body {
 	background-color: rgb(246, 246, 246);
 }
@@ -26,6 +28,9 @@ body {
 	-moz-osx-font-smoothing: grayscale;
 	text-align: center;
 	color: #2c3e50;
-	margin-top: 60px;
+
+	@include media-tablet() {
+		margin-top: 60px;
+	}
 }
 </style>

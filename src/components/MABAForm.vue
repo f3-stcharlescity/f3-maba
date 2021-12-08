@@ -1,7 +1,10 @@
 <template>
 <div class="maba-form">
 	<header class="maba-form__header subsection centered">
-		<img src="../assets/maba-2022-banner.png" alt="F3 St. Louis, Fitness, Fellowship, and Faith"/>
+		<img src="../assets/maba-2022-banner.png"
+			 alt="F3 St. Louis, Fitness, Fellowship, and Faith"
+			 class="maba-form__banner"
+		/>
 	</header>
 	<div class="maba-form__content">
 		<slot></slot>
@@ -16,8 +19,10 @@ export default {
 </script>
 
 <style lang="scss">
+@import "../assets/styles/styles";
+
 .maba-form {
-	width: 770px;
+	max-width: 770px;
 	margin: auto;
 	background: transparent;
 
@@ -39,6 +44,11 @@ export default {
 	.subsection.spread {
 		display: flex;
 		justify-content: space-between;
+		flex-direction: column;
+
+		@include media-tablet() {
+			flex-direction: row;
+		}
 	}
 
 	input, select {
@@ -49,9 +59,29 @@ export default {
 		border-radius: 0.5rem;
 	}
 
+	button {
+		font-size: 1.2rem;
+	}
+
 	input.invalid, select.invalid {
 		border: 1px solid #ff4141;
 		outline: none;
 	}
+
+	label {
+		cursor: pointer;
+	}
+
+	h2 {
+		font-size: 1.2rem;
+
+		@include media-tablet() {
+			font-size: 1.5rem;
+		}
+	}
+}
+
+.maba-form__banner {
+	width: 100%;
 }
 </style>
