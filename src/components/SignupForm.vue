@@ -121,7 +121,7 @@
 				<button @click="onSubmitForm">Submit</button>
 			</div>
 			<div class="buttons--right">
-				<button @click="onResetBurpees">Reset burpees ONLY</button>
+				<button @click="onResetBurpees" v-if="hasModifiedBurpees">Reset burpees ONLY</button>
 				<button @click="onResetForm">Reset form</button>
 			</div>
 		</section>
@@ -154,6 +154,7 @@ export default {
 			"totalBurpees",
 			"selectedRegion",
 			"himName",
+			"hasModifiedBurpees",
 		] ),
 		nameFieldClasses() {
 			const { name: nameHasError, } = this.validation;
@@ -178,7 +179,6 @@ export default {
 			"resetBurpees",
 		] ),
 		...mapActions( "signupForm", [
-			"refreshHims",
 			"changeRegion",
 			"changeHim",
 			"save",
