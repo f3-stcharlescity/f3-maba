@@ -31,7 +31,7 @@ const getHims = async ( req, res ) => {
 	sql = sql.concat( [ "order by region, f3_name" ] );
 
 	const sqlQuery = sql.join( " " );
-	const client = db.getClient();
+	const client = await db.getClient();
 	const dbres = await client.query( sqlQuery, sqlParams );
 	return res.json( Array.from( dbres.rows ) );
 };
@@ -49,7 +49,7 @@ const postHim = async ( req, res ) => {
 		return res.status( 400 ).send( "Invalid F3 name." );
 	}
 
-	const client = db.getClient();
+	const client = await db.getClient();
 
 	const himQuery = "select count(*) as hits from hims where region = $1 and lower(f3_name) = $2;";
 	const himValues = [ region, f3_name.toLowerCase() ];
@@ -66,7 +66,7 @@ const postHim = async ( req, res ) => {
 
 const getBurpees = async ( req, res ) => {
 
-	const zeroFillBurpees = ( rows ) => {
+	const zeroFillBurpees = ( formattedRows ) => {
 		const rowsByDate = keyBy( formattedRows, "date" );
 		const allBurpees = [];
 		const daysInJanuary = 31;
@@ -87,7 +87,7 @@ const getBurpees = async ( req, res ) => {
 	year = parseInt( `${ year }`, 10 );
 	const query = "select DATE(date), count from burpees where him_id = $1 and date_part('year', date) = $2 order by date asc;";
 	const values = [ himId, year ];
-	const client = db.getClient();
+	const client = await db.getClient();
 	const result = await client.query( query, values );
 
 	const formattedRows = result.rows.map( row => {
@@ -119,7 +119,7 @@ const postBurpees = async ( req, res ) => {
 	sql.push( "on conflict (him_id, date) do update set count = EXCLUDED.count returning *;" );
 	const insertQuery = sql.join( " " );
 
-	const client = db.getClient();
+	const client = await db.getClient();
 	const insertResult = await client.query( insertQuery, values );
 
 	const formattedRows = insertResult.rows.map( row => {

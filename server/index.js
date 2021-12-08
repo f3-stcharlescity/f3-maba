@@ -1,6 +1,5 @@
 const express = require( "express" );
 const bodyParser = require( "body-parser" );
-const serveStatic = require( "serve-static" );
 const path = require( "path" );
 const mountAPI = require( "./api" );
 const db = require( "./data/db" );
@@ -35,7 +34,7 @@ mountAPI( app );
 
 // second, set up the static resolver for assets
 const distPath = path.join( __dirname, "..", "dist" );
-app.use( serveStatic( distPath ) );
+app.use( express.static( distPath ) );
 
 // finally, set up the fall-through to return the index for all requests,
 // because this is an SPA
@@ -44,14 +43,16 @@ app.get( "*", ( req, res ) => {
 } );
 
 // set up the global request error handler
-// eslint-disable-next-line no-unused-vars
 app.use( ( err, req, res, next ) => {
-	console.error( err );
-	db.teardownDB(); // TODO: for each request
 	if ( req.xhr ) {
 		return res.status( 500 ).send( { error: "Something failed!" } );
 	}
 	next( err );
+} );
+
+process.on( "SIGINT", async () => {
+	await db.teardownDB();
+	process.exit( 0 );
 } );
 
 // start the app
