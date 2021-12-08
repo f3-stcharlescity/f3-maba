@@ -3,7 +3,7 @@
 		<section class="subsection description">
 			<h1>Welcome to Year 2 of MABA — Make America Burpee Again.</h1>
 
-			<p><strong>The challenge:</strong> Do 3,100 burpees in January. You can do 100 every single day, or you can
+			<p><strong>The challenge:</strong> Do 3,100 burpees in January. You can do 100 every day, or you can
 				bank a bunch and
 				take days off. Other than that, there are no rules. Clap at the top, don’t clap the top, either is fine.
 				100 of anything is a lot for one day, so push yourself but don’t hurt yourself.</p>
