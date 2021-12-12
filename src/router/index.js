@@ -6,26 +6,43 @@ export default function ( { store } ) {
 	const routes = [
 		{
 			path: "/",
-			name: "root",
-			redirect: { name: "signup", }
+			redirect: "/signup/2022",
 		},
+		//
+		// signup
+		//
 		{
 			path: "/signup",
+			redirect: "/signup/2022",
+		},
+		{
+			path: "/signup/:year",
 			name: "signup",
 			component: SignupPage,
 			beforeEnter( to, from, next ) {
-				document.title = "MABA - Signup";
-				store.dispatch( "signupPage/initializeStore" );
+				const { params } = to;
+				const { year } = params;
+				document.title = `MABA - Signup - ${ year }`;
+				store.dispatch( "signupPage/initializeStore", { year, } );
 				next();
 			}
 		},
+		//
+		// stats
+		//
 		{
 			path: "/stats",
+			redirect: "/stats/2022",
+		},
+		{
+			path: "/stats/:year",
 			name: "stats",
 			component: StatsPage,
 			beforeEnter( to, from, next ) {
-				document.title = "MABA - Stats";
-				store.dispatch( "statsPage/initializeStore" );
+				const { params } = to;
+				const { year } = params;
+				document.title = `MABA - Stats - ${ year }`;
+				store.dispatch( "statsPage/initializeStore", { year, } );
 				next();
 			}
 		}

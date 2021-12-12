@@ -6,21 +6,19 @@ import { NONE_REGION } from "@/lib/enum";
 import { padZero } from "@/lib/util";
 import { notifyError, notifyInfo, notifySuccess, notifyUnknownError, } from "./notify";
 
-const urlParams = new URLSearchParams( location.search );
-
 const today = new Date();
-const BURPEE_YEAR = urlParams.get( "year" ) || today.getFullYear().toString();
+const BURPEE_YEAR = today.getFullYear().toString();
 
 const HIM_STATUS = {
 	NEW: "NEW",
 	EXISTING: "EXISTING",
 };
 
-const pristineBurpees = () => {
+const pristineBurpees = ( { year } ) => {
 	const allBurpees = [];
 	const daysInJanuary = 31;
 	for ( const day of range( 1, daysInJanuary + 1 ) ) {
-		const date = `${ BURPEE_YEAR }-01-${ padZero( day ) }`;
+		const date = `${ year }-01-${ padZero( day ) }`;
 		const burpee = {
 			date,
 			count: 0,
@@ -30,10 +28,11 @@ const pristineBurpees = () => {
 	return allBurpees;
 };
 
-const pristineState = () => {
+const pristineState = ( { year } ) => {
 	return {
 		isStoreInitialized: false,
 
+		year,
 		regions: [],
 		hims: [],
 
@@ -45,14 +44,14 @@ const pristineState = () => {
 
 		selectedRegion: NONE_REGION,
 		selectedHimId: "",
-		burpees: pristineBurpees(),
+		burpees: pristineBurpees( { year } ),
 		modifiedBurpees: {},
 	};
 };
 
 export default {
 	namespaced: true,
-	state: pristineState(),
+	state: pristineState( { year: BURPEE_YEAR, } ),
 	getters: {
 		validation: ( state, getters ) => {
 			const validation = {};
@@ -71,7 +70,7 @@ export default {
 			} );
 			return validation;
 		},
-		burpeeYear: _ => BURPEE_YEAR,
+		burpeeYear: state => state.year,
 		regions: state => state.regions,
 		hims: state => state.hims,
 		selectedRegion: state => state.selectedRegion,
@@ -112,8 +111,9 @@ export default {
 		hasEnteredEmail: state => state.hasEnteredEmail,
 	},
 	mutations: {
-		storeInitialized( state, { regions, selectedRegion, hims, selectedHimId, burpees, himStatus, } ) {
-			Object.assign( state, pristineState() );
+		storeInitialized( state, { year, regions, selectedRegion, hims, selectedHimId, burpees, himStatus, } ) {
+			Object.assign( state, pristineState( { year } ) );
+			state.year = year;
 			state.isStoreInitialized = true;
 			state.regions = regions;
 			state.selectedRegion = selectedRegion;
@@ -187,12 +187,12 @@ export default {
 		},
 	},
 	actions: {
-		async initializeStore( { commit } ) {
+		async initializeStore( { commit }, { year, } ) {
 			try {
 				let selectedRegion = NONE_REGION;
 				let selectedHimId = "";
 				let himStatus = HIM_STATUS.NEW;
-				let burpees = pristineBurpees();
+				let burpees = pristineBurpees( { year } );
 
 				const [ regions, ] = await Promise.all( [
 					axios.get( "/api/regions" ),
@@ -219,7 +219,7 @@ export default {
 				}
 
 				if ( himStatus === HIM_STATUS.EXISTING ) {
-					const url = `/api/hims/${ selectedHimId }/burpees?year=${ BURPEE_YEAR }`;
+					const url = `/api/hims/${ selectedHimId }/burpees?year=${ year }`;
 					const burpeesResult = await axios.get( url );
 					burpees = burpeesResult.data;
 				}
@@ -227,6 +227,7 @@ export default {
 				console.info( { selectedHimId, selectedRegion } );
 
 				commit( "storeInitialized", {
+					year,
 					regions,
 					selectedRegion,
 					hims,
@@ -240,8 +241,9 @@ export default {
 		},
 		async resetStore( { state, commit } ) {
 			try {
+				const { year } = state;
 				let selectedHimId = "";
-				let burpees = pristineBurpees();
+				let burpees = pristineBurpees( { year } );
 
 				const regions = [
 					...state.regions,
@@ -260,6 +262,7 @@ export default {
 				const himStatus = HIM_STATUS.NEW;
 
 				commit( "storeInitialized", {
+					year,
 					regions,
 					selectedRegion,
 					hims,
@@ -295,9 +298,10 @@ export default {
 				notifyUnknownError( e );
 			}
 		},
-		async changeHim( { commit }, himId ) {
+		async changeHim( { state, commit, }, himId ) {
 			try {
-				const url = `/api/hims/${ himId }/burpees?year=${ BURPEE_YEAR }`;
+				const { year } = state;
+				const url = `/api/hims/${ himId }/burpees?year=${ year }`;
 				const result = await axios.get( url );
 				const burpees = result.data;
 				commit( "himChanged", { himId, burpees, } );
@@ -305,13 +309,13 @@ export default {
 				notifyUnknownError( e );
 			}
 		},
-		async changeHimStatus( { state, commit }, status ) {
+		async changeHimStatus( { state, commit, }, status ) {
 			try {
 				let burpees = pristineBurpees();
-				const { selectedHimId, } = state;
+				const { selectedHimId, year, } = state;
 
 				if ( status === HIM_STATUS.EXISTING && selectedHimId ) {
-					const url = `/api/hims/${ selectedHimId }/burpees?year=${ BURPEE_YEAR }`;
+					const url = `/api/hims/${ selectedHimId }/burpees?year=${ year }`;
 					const result = await axios.get( url );
 					burpees = result.data;
 				}
@@ -339,7 +343,7 @@ export default {
 					if ( validation.email ) {
 						return notifyInfo( validation.email );
 					}
-					const { name, email, selectedRegion, selectedAO, } = state;
+					const { name, email, selectedRegion, } = state;
 					const body = { f3_name: name.trim(), email: email.trim(), region: selectedRegion, };
 					const himResult = await axios.post( "/api/hims", body );
 					him = himResult.data;
