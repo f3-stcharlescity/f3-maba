@@ -1,4 +1,9 @@
 // @see https://devfacts.com/media-queries-breakpoints-2021/
+@mixin media-mobile() {
+	@media (max-width: 767px) {
+		@content;
+	}
+}
 
 @mixin media-tablet() {
 	@media (min-width: 768px) {
