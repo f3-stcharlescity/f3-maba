@@ -8,9 +8,10 @@ import {
 
 const urlParams = new URLSearchParams( location.search );
 
-const BURPEE_YEAR = urlParams.get( "year" ) || "2022";
-const BURPEE_MONTH = urlParams.get( "month" ) || "01";
-const BURPEE_DAY = urlParams.get( "day" ) || ( new Date() ).getDate().toString();
+const today = new Date();
+const BURPEE_YEAR = urlParams.get( "year" ) || today.getFullYear().toString();
+const BURPEE_MONTH = "01";
+const BURPEE_DAY = urlParams.get( "day" ) || today.getDate().toString();
 
 const pristineState = () => {
 	return {

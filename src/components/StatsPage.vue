@@ -24,25 +24,26 @@
 
 		<section class="subsection">
 			<h2 class="centered">Region Leaderboard</h2>
-			<table class="stat-table">
+			<table class="stat-table regions-table" v-if="formattedRegionCounts.length">
 				<tr>
 					<th>Region</th>
 					<th>Cumulative Burpee Count</th>
 					<th>Today's Burpee Count</th>
-					<th>Chart</th>
+					<!-- <th>Chart</th> -->
 				</tr>
 				<tr v-for="counts in formattedRegionCounts" :key="counts.region">
 					<td>{{ counts.region }}</td>
 					<td>{{ counts.cumulative_burpee_count }}</td>
 					<td>{{ counts.daily_burpee_count }}</td>
-					<td>TBD</td>
+					<!-- <td>TBD</td> -->
 				</tr>
 			</table>
+			<p class="centered" v-else>No regions have posted burpees yet. Your region's PAX can sign up <a href="/signup">here</a>.</p>
 		</section>
 
 		<section class="subsection">
 			<h2 class="centered">Top PAX</h2>
-			<table class="stat-table">
+			<table class="stat-table pax-table" v-if="formattedPaxCounts.length">
 				<tr>
 					<th>HIM</th>
 					<th>Region</th>
@@ -56,6 +57,7 @@
 					<td>{{ counts.daily_burpee_count }}</td>
 				</tr>
 			</table>
+			<p class="centered" v-else>No PAX have posted burpees yet. Your region's PAX can sign up <a href="/signup">here</a>.</p>
 		</section>
 	</MABAForm>
 </template>
@@ -178,12 +180,31 @@ export default {
 	}
 
 	td, th {
-		width: 25%;
+		text-align: center;
 		padding: 0.2rem;
 
 		@include media-tablet() {
-			width: auto;
 			padding: 0.5rem;
+		}
+	}
+}
+
+.regions-table {
+	td, th {
+		width: 33%;
+
+		@include media-tablet() {
+			width: auto;
+		}
+	}
+}
+
+.pax-table {
+	td, th {
+		width: 25%;
+
+		@include media-tablet() {
+			width: auto;
 		}
 	}
 }

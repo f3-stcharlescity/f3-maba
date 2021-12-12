@@ -3,16 +3,13 @@ import orderBy from "lodash/orderBy";
 import range from "lodash/range";
 import { isEmailValid } from "@/lib/validation";
 import { NONE_REGION } from "@/lib/enum";
-import {
-	notifySuccess,
-	notifyInfo,
-	notifyError,
-	notifyUnknownError,
-} from "./notify";
+import { padZero } from "@/lib/util";
+import { notifyError, notifyInfo, notifySuccess, notifyUnknownError, } from "./notify";
 
 const urlParams = new URLSearchParams( location.search );
 
-const BURPEE_YEAR = urlParams.get( "year" ) || "2022";
+const today = new Date();
+const BURPEE_YEAR = urlParams.get( "year" ) || today.getFullYear().toString();
 
 const HIM_STATUS = {
 	NEW: "NEW",
@@ -22,10 +19,8 @@ const HIM_STATUS = {
 const pristineBurpees = () => {
 	const allBurpees = [];
 	const daysInJanuary = 31;
-	const year = BURPEE_YEAR;
-	const padZero = n => n < 10 ? `0${ n }` : `${ n }`;
 	for ( const day of range( 1, daysInJanuary + 1 ) ) {
-		const date = `${ year }-01-${ padZero( day ) }`;
+		const date = `${ BURPEE_YEAR }-01-${ padZero( day ) }`;
 		const burpee = {
 			date,
 			count: 0,
@@ -76,6 +71,7 @@ export default {
 			} );
 			return validation;
 		},
+		burpeeYear: _ => BURPEE_YEAR,
 		regions: state => state.regions,
 		hims: state => state.hims,
 		selectedRegion: state => state.selectedRegion,

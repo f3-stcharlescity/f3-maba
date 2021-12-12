@@ -107,8 +107,8 @@
 
 		<section class="subsection" v-if="mergedBurpees.length">
 			<h2 class="burpees-heading">
-				<span v-if="himName">2022 Burpees for {{ himName }}</span>
-				<span v-else>2022 Burpees</span>
+				<span v-if="himName">{{ burpeeYear }} Burpees for {{ himName }}</span>
+				<span v-else>{{ burpeeYear }} Burpees</span>
 				<span>Total: {{ totalBurpees }}</span>
 			</h2>
 			<Burpees :burpees="mergedBurpees"
@@ -141,6 +141,7 @@ export default {
 	},
 	computed: {
 		...mapGetters( "signupPage", [
+			"burpeeYear",
 			"validation",
 			"regions",
 			"hims",
