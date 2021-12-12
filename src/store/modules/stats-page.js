@@ -1,5 +1,10 @@
-// import { notify } from "@kyvg/vue3-notification";
 import axios from "axios";
+import {
+	notifySuccess,
+	notifyInfo,
+	notifyError,
+	notifyUnknownError,
+} from "./notify";
 
 const urlParams = new URLSearchParams( location.search );
 
@@ -55,14 +60,14 @@ export default {
 					paxCounts,
 				} );
 			} catch ( e ) {
-				console.error( e );
+				notifyUnknownError( e );
 			}
 		},
 		resetStore( { commit } ) {
 			try {
 				commit( "storeInitialized", pristineState() );
 			} catch ( e ) {
-				console.error( e );
+				notifyUnknownError( e );
 			}
 		},
 	},

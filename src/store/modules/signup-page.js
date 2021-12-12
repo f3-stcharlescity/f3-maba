@@ -1,10 +1,14 @@
-import { notify } from "@kyvg/vue3-notification";
 import axios from "axios";
 import orderBy from "lodash/orderBy";
-
+import range from "lodash/range";
 import { isEmailValid } from "@/lib/validation";
 import { NONE_REGION } from "@/lib/enum";
-import range from "lodash/range";
+import {
+	notifySuccess,
+	notifyInfo,
+	notifyError,
+	notifyUnknownError,
+} from "./notify";
 
 const urlParams = new URLSearchParams( location.search );
 
@@ -13,34 +17,6 @@ const BURPEE_YEAR = urlParams.get( "year" ) || "2022";
 const HIM_STATUS = {
 	NEW: "NEW",
 	EXISTING: "EXISTING",
-};
-
-const notifySuccess = ( text ) => {
-	notify( {
-		text,
-		type: "success"
-	} );
-};
-
-const notifyInfo = ( text ) => {
-	notify( {
-		text,
-		type: "info"
-	} );
-};
-
-const notifyError = ( text, e = null ) => {
-	if ( e ) {
-		console.error( e );
-	}
-	notify( {
-		text: text || ( e ? e.message : "" ) || "",
-		type: "error"
-	} );
-};
-
-const notifyUnknownError = ( e ) => {
-	notifyError( "An unknown error has occurred. Please refresh the page and try again.", e );
 };
 
 const pristineBurpees = () => {
