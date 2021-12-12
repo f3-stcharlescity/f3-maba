@@ -32,17 +32,17 @@ export default function ( { store } ) {
 		//
 		{
 			path: "/stats",
-			redirect: "/stats/2022",
+			redirect: "/stats/2022/01",
 		},
 		{
-			path: "/stats/:year",
+			path: "/stats/:year/:day",
 			name: "stats",
 			component: StatsPage,
 			beforeEnter( to, from, next ) {
 				const { params } = to;
-				const { year } = params;
+				const { year, day, } = params;
 				document.title = `MABA - Stats - ${ year }`;
-				store.dispatch( "statsPage/initializeStore", { year, } );
+				store.dispatch( "statsPage/initializeStore", { year, day, } );
 				next();
 			}
 		}

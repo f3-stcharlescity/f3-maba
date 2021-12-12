@@ -6,15 +6,15 @@ import { NONE_REGION } from "@/lib/enum";
 import { padZero } from "@/lib/util";
 import { notifyError, notifyInfo, notifySuccess, notifyUnknownError, } from "./notify";
 
-const today = new Date();
-const BURPEE_YEAR = today.getFullYear().toString();
-
 const HIM_STATUS = {
 	NEW: "NEW",
 	EXISTING: "EXISTING",
 };
 
-const pristineBurpees = ( { year } ) => {
+const pristineBurpees = ( { year = "", } = {} ) => {
+	if ( !year ) {
+		return [];
+	}
 	const allBurpees = [];
 	const daysInJanuary = 31;
 	for ( const day of range( 1, daysInJanuary + 1 ) ) {
@@ -28,7 +28,7 @@ const pristineBurpees = ( { year } ) => {
 	return allBurpees;
 };
 
-const pristineState = ( { year } ) => {
+const pristineState = ( { year = "" } = {} ) => {
 	return {
 		isStoreInitialized: false,
 
@@ -51,7 +51,7 @@ const pristineState = ( { year } ) => {
 
 export default {
 	namespaced: true,
-	state: pristineState( { year: BURPEE_YEAR, } ),
+	state: pristineState(),
 	getters: {
 		validation: ( state, getters ) => {
 			const validation = {};
@@ -113,7 +113,6 @@ export default {
 	mutations: {
 		storeInitialized( state, { year, regions, selectedRegion, hims, selectedHimId, burpees, himStatus, } ) {
 			Object.assign( state, pristineState( { year } ) );
-			state.year = year;
 			state.isStoreInitialized = true;
 			state.regions = regions;
 			state.selectedRegion = selectedRegion;

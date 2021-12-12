@@ -6,16 +6,12 @@ import {
 	notifyUnknownError,
 } from "./notify";
 
-const urlParams = new URLSearchParams( location.search );
-
-const today = new Date();
-const BURPEE_YEAR = today.getFullYear().toString();
 const BURPEE_MONTH = "01";
-const BURPEE_DAY = urlParams.get( "day" ) || today.getDate().toString();
 
-const pristineState = ( { year, } ) => {
+const pristineState = () => {
 	return {
-		year,
+		year: "",
+		day: "",
 		globalCountrywideCount: 0,
 		globalDailyCount: 0,
 		regionCounts: [],
@@ -25,7 +21,7 @@ const pristineState = ( { year, } ) => {
 
 export default {
 	namespaced: true,
-	state: pristineState( { year: BURPEE_YEAR, } ),
+	state: pristineState(),
 	getters: {
 		globalCountrywideCount: state => state.globalCountrywideCount,
 		globalDailyCount: state => state.globalDailyCount,
@@ -33,8 +29,8 @@ export default {
 		paxCounts: state => state.paxCounts,
 	},
 	mutations: {
-		storeInitialized( state, { year, globalCountrywideCount, globalDailyCount, regionCounts, paxCounts, } ) {
-			Object.assign( state, pristineState( { year } ) );
+		storeInitialized( state, { year, day, globalCountrywideCount, globalDailyCount, regionCounts, paxCounts, } ) {
+			Object.assign( state, pristineState( { year, day, } ) );
 			state.globalCountrywideCount = globalCountrywideCount;
 			state.globalDailyCount = globalDailyCount;
 			state.regionCounts = regionCounts;
@@ -42,13 +38,13 @@ export default {
 		},
 	},
 	actions: {
-		async initializeStore( { commit }, { year, } ) {
+		async initializeStore( { commit }, { year, day, } ) {
 			try {
 
 				const statsResults = await Promise.all( [
-					axios.get( `/api/stats/${ year }/${ BURPEE_MONTH }/${ BURPEE_DAY }/global` ),
-					axios.get( `/api/stats/${ year }/${ BURPEE_MONTH }/${ BURPEE_DAY }/regions` ),
-					axios.get( `/api/stats/${ year }/${ BURPEE_MONTH }/${ BURPEE_DAY }/pax` ),
+					axios.get( `/api/stats/${ year }/${ BURPEE_MONTH }/${ day }/global` ),
+					axios.get( `/api/stats/${ year }/${ BURPEE_MONTH }/${ day }/regions` ),
+					axios.get( `/api/stats/${ year }/${ BURPEE_MONTH }/${ day }/pax` ),
 				] );
 
 				const globalCounts = statsResults[ 0 ].data;
@@ -57,6 +53,7 @@ export default {
 
 				commit( "storeInitialized", {
 					year,
+					day,
 					globalCountrywideCount: globalCounts.cumulative_burpee_count,
 					globalDailyCount: globalCounts.daily_burpee_count,
 					regionCounts,
