@@ -1,21 +1,21 @@
 <template>
-<div class="maba-form">
-	<header class="maba-form__header subsection centered">
-		<img src="../assets/maba-2022-banner.png"
-			 alt="F3 St. Louis, Fitness, Fellowship, and Faith"
-			 class="maba-form__banner"
-		/>
-	</header>
-	<div class="maba-form__content">
-		<slot></slot>
+	<div class="maba-form">
+		<header class="maba-form__header subsection centered">
+			<img src="../assets/maba-2022-banner.png"
+				 alt="F3 St. Louis, Fitness, Fellowship, and Faith"
+				 class="maba-form__banner"
+			/>
+		</header>
+		<div class="maba-form__content">
+			<slot></slot>
+		</div>
 	</div>
-</div>
 </template>
 
 <script>
 export default {
 	name: "MABAForm"
-}
+};
 </script>
 
 <style lang="scss">
@@ -77,6 +77,12 @@ export default {
 
 		@include media-tablet() {
 			font-size: 1.5rem;
+		}
+	}
+
+	h1, h2, h3, h4, h5, h6, p, label {
+		&.centered {
+			text-align: center;
 		}
 	}
 }

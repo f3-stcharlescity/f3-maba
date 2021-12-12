@@ -2,9 +2,11 @@ const { v4: uuidv4 } = require( "uuid" );
 const moment = require( "moment-timezone" );
 const range = require( "lodash/range" );
 const keyBy = require( "lodash/keyBy" );
-const db = require( "./data/db" );
-const regions = require( "./data/regions.json" );
-const { isEmailValid, isRegionValid } = require( "./validation" );
+const db = require( "../data/db" );
+const regions = require( "../data/regions.json" );
+const { isEmailValid, isRegionValid } = require( "../validation" );
+
+const statsAPI = require("./stats");
 
 const getRegions = ( req, res ) => {
 	res.json( regions );
@@ -147,4 +149,5 @@ module.exports = function ( app ) {
 	app.post( "/api/hims", postHim );
 	app.get( "/api/hims/:himId/burpees", getBurpees );
 	app.post( "/api/hims/:himId/burpees", postBurpees );
+	statsAPI( app );
 };

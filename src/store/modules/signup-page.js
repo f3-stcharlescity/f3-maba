@@ -1,53 +1,26 @@
-import { notify } from "@kyvg/vue3-notification";
 import axios from "axios";
 import orderBy from "lodash/orderBy";
-
-import { isEmailValid } from "@/lib/validation";
-import { NONE_REGION, NONE_AO } from "@/lib/enum";
 import range from "lodash/range";
+import { isEmailValid } from "@/lib/validation";
+import { NONE_REGION } from "@/lib/enum";
+import { padZero } from "@/lib/util";
+import { notifyError, notifyInfo, notifySuccess, notifyUnknownError, } from "./notify";
 
-const BURPEE_YEAR = 2022;
+const urlParams = new URLSearchParams( location.search );
+
+const today = new Date();
+const BURPEE_YEAR = urlParams.get( "year" ) || today.getFullYear().toString();
 
 const HIM_STATUS = {
 	NEW: "NEW",
 	EXISTING: "EXISTING",
 };
 
-const notifySuccess = ( text ) => {
-	notify( {
-		text,
-		type: "success"
-	} );
-};
-
-const notifyInfo = ( text ) => {
-	notify( {
-		text,
-		type: "info"
-	} );
-};
-
-const notifyError = ( text, e = null ) => {
-	if ( e ) {
-		console.error( e );
-	}
-	notify( {
-		text: text || ( e ? e.message : "" ) || "",
-		type: "error"
-	} );
-};
-
-const notifyUnknownError = ( e ) => {
-	notifyError( "An unknown error has occurred. Please refresh the page and try again.", e );
-};
-
 const pristineBurpees = () => {
 	const allBurpees = [];
 	const daysInJanuary = 31;
-	const year = BURPEE_YEAR;
-	const padZero = n => n < 10 ? `0${ n }` : `${ n }`;
 	for ( const day of range( 1, daysInJanuary + 1 ) ) {
-		const date = `${ year }-01-${ padZero( day ) }`;
+		const date = `${ BURPEE_YEAR }-01-${ padZero( day ) }`;
 		const burpee = {
 			date,
 			count: 0,
@@ -98,6 +71,7 @@ export default {
 			} );
 			return validation;
 		},
+		burpeeYear: _ => BURPEE_YEAR,
 		regions: state => state.regions,
 		hims: state => state.hims,
 		selectedRegion: state => state.selectedRegion,
