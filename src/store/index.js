@@ -1,11 +1,13 @@
 import { createStore, createLogger } from "vuex";
-import signupForm from "./modules/signup-form";
+import signupPage from "./modules/signup-page";
+import statsPage from "./modules/stats-page";
 
 const isDevEnvironment = process.env.NODE_ENV !== "production";
 
 const store = createStore({
 	modules: {
-		signupForm,
+		signupPage,
+		statsPage,
 	},
 	strict: isDevEnvironment,
 	plugins: isDevEnvironment ? [ createLogger() ] : [],

@@ -134,13 +134,13 @@ import MABAForm from "./MABAForm";
 import Burpees from "./Burpees";
 
 export default {
-	name: "SignupForm",
+	name: "SignupPage",
 	components: {
 		MABAForm,
 		Burpees,
 	},
 	computed: {
-		...mapGetters( "signupForm", [
+		...mapGetters( "signupPage", [
 			"validation",
 			"regions",
 			"hims",
@@ -172,13 +172,13 @@ export default {
 		},
 	},
 	methods: {
-		...mapMutations( "signupForm", [
+		...mapMutations( "signupPage", [
 			"changeName",
 			"changeEmail",
 			"changeBurpeeCount",
 			"resetBurpees",
 		] ),
-		...mapActions( "signupForm", [
+		...mapActions( "signupPage", [
 			"changeRegion",
 			"changeHim",
 			"save",
