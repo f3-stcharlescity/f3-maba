@@ -3,10 +3,12 @@ import axios from "axios";
 import orderBy from "lodash/orderBy";
 
 import { isEmailValid } from "@/lib/validation";
-import { NONE_REGION, NONE_AO } from "@/lib/enum";
+import { NONE_REGION } from "@/lib/enum";
 import range from "lodash/range";
 
-const BURPEE_YEAR = 2022;
+const urlParams = new URLSearchParams( location.search );
+
+const BURPEE_YEAR = urlParams.get( "year" ) || "2022";
 
 const HIM_STATUS = {
 	NEW: "NEW",

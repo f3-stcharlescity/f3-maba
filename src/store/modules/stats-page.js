@@ -1,79 +1,66 @@
+// import { notify } from "@kyvg/vue3-notification";
+import axios from "axios";
+
+const urlParams = new URLSearchParams( location.search );
+
+const BURPEE_YEAR = urlParams.get( "year" ) || "2022";
+const BURPEE_MONTH = urlParams.get( "month" ) || "01";
+const BURPEE_DAY = urlParams.get( "day" ) || ( new Date() ).getDate().toString();
+
 const pristineState = () => {
-	return {};
+	return {
+		globalCountrywideCount: 0,
+		globalDailyCount: 0,
+		regionCounts: [],
+		paxCounts: [],
+	};
 };
 
 export default {
 	namespaced: true,
 	state: pristineState(),
 	getters: {
-		globalCountrywideCount( state ) {
-			return 3650;
-		},
-		globalDailyCount( state ) {
-			return 500;
-		},
-		regionCounts( state ) {
-			return [
-				{
-					region: "St. Charles",
-					cumulativeBurpeeCount: 900,
-					todaysBurpeeCount: 100,
-				},
-				{
-					region: "St. Louis",
-					cumulativeBurpeeCount: 1002,
-					todaysBurpeeCount: 150,
-				},
-				{
-					region: "Jefferson County",
-					cumulativeBurpeeCount: 900,
-					todaysBurpeeCount: 100,
-				},
-				{
-					region: "Lala Land",
-					cumulativeBurpeeCount: 1002,
-					todaysBurpeeCount: 150,
-				},
-			];
-		},
-		paxCounts( state ) {
-			return [
-				{
-					him: "Banjo",
-					region: "St. Charles",
-					cumulativeBurpeeCount: 200,
-					todaysBurpeeCount: 50,
-				},
-				{
-					him: "dialup",
-					region: "St. Charles",
-					cumulativeBurpeeCount: 100,
-					todaysBurpeeCount: 100,
-				},
-				{
-					him: "Cowbell",
-					region: "St. Charles",
-					cumulativeBurpeeCount: 150,
-					todaysBurpeeCount: 90,
-				},
-			];
-		},
+		globalCountrywideCount: state => state.globalCountrywideCount,
+		globalDailyCount: state => state.globalDailyCount,
+		regionCounts: state => state.regionCounts,
+		paxCounts: state => state.paxCounts,
 	},
 	mutations: {
-		storeInitialized( state, {} ) {
+		storeInitialized( state, { globalCountrywideCount, globalDailyCount, regionCounts, paxCounts, } ) {
+			Object.assign( state, pristineState() );
+			state.globalCountrywideCount = globalCountrywideCount;
+			state.globalDailyCount = globalDailyCount;
+			state.regionCounts = regionCounts;
+			state.paxCounts = paxCounts;
 		},
 	},
 	actions: {
-		initializeStore( { commit } ) {
+		async initializeStore( { commit } ) {
 			try {
-				commit( "storeInitialized", {} );
+
+				const statsResults = await Promise.all( [
+					axios.get( `/api/stats/${ BURPEE_YEAR }/${ BURPEE_MONTH }/${ BURPEE_DAY }/global` ),
+					axios.get( `/api/stats/${ BURPEE_YEAR }/${ BURPEE_MONTH }/${ BURPEE_DAY }/regions` ),
+					axios.get( `/api/stats/${ BURPEE_YEAR }/${ BURPEE_MONTH }/${ BURPEE_DAY }/pax` ),
+				] );
+
+				const globalCounts = statsResults[ 0 ].data;
+				const regionCounts = statsResults[ 1 ].data;
+				const paxCounts = statsResults[ 2 ].data;
+
+				commit( "storeInitialized", {
+					globalCountrywideCount: globalCounts.cumulative_burpee_count,
+					globalDailyCount: globalCounts.daily_burpee_count,
+					regionCounts,
+					paxCounts,
+				} );
 			} catch ( e ) {
 				console.error( e );
 			}
 		},
 		resetStore( { commit } ) {
 			try {
-				commit( "storeInitialized", {} );
+				commit( "storeInitialized", pristineState() );
 			} catch ( e ) {
 				console.error( e );
 			}

@@ -6,19 +6,19 @@
 				<h2 class="global-stat-header centered">Today's Burpee Count</h2>
 			</div>
 			<div class="global-stats">
-				<label class="global-stat centered">{{ globalCountrywideCount }}</label>
-				<label class="global-stat centered">{{ globalDailyCount }}</label>
+				<label class="global-stat centered">{{ formattedGlobalCountrywideCount }}</label>
+				<label class="global-stat centered">{{ formattedGlobalDailyCount }}</label>
 			</div>
 		</section>
 
 		<section class="subsection global-stats-container mobile">
 			<div class="global-stats">
 				<h2 class="global-stat-header centered">Countrywide Cumulative Burpees &mdash;<br/>Month to Date</h2>
-				<label class="global-stat centered">{{ globalCountrywideCount }}</label>
+				<label class="global-stat centered">{{ formattedGlobalCountrywideCount }}</label>
 			</div>
 			<div class="global-stats">
 				<h2 class="global-stat-header centered">Today's Burpee Count</h2>
-				<label class="global-stat centered">{{ globalDailyCount }}</label>
+				<label class="global-stat centered">{{ formattedGlobalDailyCount }}</label>
 			</div>
 		</section>
 
@@ -31,10 +31,10 @@
 					<th>Today's Burpee Count</th>
 					<th>Chart</th>
 				</tr>
-				<tr v-for="counts in regionCounts" :key="counts.region">
+				<tr v-for="counts in formattedRegionCounts" :key="counts.region">
 					<td>{{ counts.region }}</td>
-					<td>{{ counts.cumulativeBurpeeCount }}</td>
-					<td>{{ counts.todaysBurpeeCount }}</td>
+					<td>{{ counts.cumulative_burpee_count }}</td>
+					<td>{{ counts.daily_burpee_count }}</td>
 					<td>TBD</td>
 				</tr>
 			</table>
@@ -49,11 +49,11 @@
 					<th>Cumulative Burpee Count</th>
 					<th>Today's Burpee Count</th>
 				</tr>
-				<tr v-for="counts in paxCounts" :key="counts.him">
+				<tr v-for="counts in formattedPaxCounts" :key="counts.him">
 					<td>{{ counts.him }}</td>
 					<td>{{ counts.region }}</td>
-					<td>{{ counts.cumulativeBurpeeCount }}</td>
-					<td>{{ counts.todaysBurpeeCount }}</td>
+					<td>{{ counts.cumulative_burpee_count }}</td>
+					<td>{{ counts.daily_burpee_count }}</td>
 				</tr>
 			</table>
 		</section>
@@ -62,6 +62,7 @@
 
 <script>
 import { mapGetters, mapMutations, mapActions } from "vuex";
+import numeral from "numeral";
 import MABAForm from "./MABAForm";
 
 export default {
@@ -75,7 +76,35 @@ export default {
 			"globalDailyCount",
 			"regionCounts",
 			"paxCounts"
-		] )
+		] ),
+		formattedGlobalCountrywideCount() {
+			return numeral( this.globalCountrywideCount ).format( "0,0" );
+		},
+		formattedGlobalDailyCount() {
+			return numeral( this.globalDailyCount ).format( "0,0" );
+		},
+		formattedRegionCounts() {
+			return this.regionCounts.map( counts => {
+				return {
+					...counts,
+					cumulative_burpee_count: numeral( counts.cumulative_burpee_count )
+						.format( "0,0" ),
+					daily_burpee_count: numeral( counts.daily_burpee_count )
+						.format( "0,0" ),
+				};
+			} );
+		},
+		formattedPaxCounts() {
+			return this.paxCounts.map( counts => {
+				return {
+					...counts,
+					cumulative_burpee_count: numeral( counts.cumulative_burpee_count )
+						.format( "0,0" ),
+					daily_burpee_count: numeral( counts.daily_burpee_count )
+						.format( "0,0" ),
+				};
+			} );
+		},
 	}
 };
 </script>
