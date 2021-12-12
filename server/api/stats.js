@@ -9,10 +9,11 @@ const getGlobalStats = async ( req, res ) => {
         select sum(count) as cumulative_burpee_count
         from burpees
         where date_part('year', date) = $1
-          and date_part('month', date) = $2;
+          and date_part('month', date) = $2
+          and date_part('day', date) <= $3;
 	`;
 
-	const cumulativeParams = [ year, month ];
+	const cumulativeParams = [ year, month, day ];
 	const cumulativeResults = await client.query( cumulativeQuery, cumulativeParams );
 	const { cumulative_burpee_count } = cumulativeResults.rows[ 0 ];
 
@@ -51,6 +52,7 @@ const getTopRegionStats = async ( req, res ) => {
             from burpees
             where date_part('year', date) = $1
               and date_part('month', date) = $2
+              and date_part('day', date) <= $3
             group by him_id
         ) as b1 on b1.him_id = h.him_id
                  join (
@@ -96,6 +98,7 @@ const getTopPaxStats = async ( req, res ) => {
             from burpees
             where date_part('year', date) = $1
               and date_part('month', date) = $2
+              and date_part('day', date) <= $3
             group by him_id
         ) as b1 on b1.him_id = h.him_id
                  join (
