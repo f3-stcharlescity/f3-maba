@@ -6,8 +6,12 @@
 				<h2 class="global-stat-header centered">Today's Burpee Count</h2>
 			</div>
 			<div class="global-stats">
-				<label class="global-stat centered">{{ formattedGlobalCountrywideCount }}</label>
-				<label class="global-stat centered">{{ formattedGlobalDailyCount }}</label>
+				<label class="global-stat centered" :title="globalCountrywideCount">
+					{{ formattedGlobalCountrywideCount }}
+				</label>
+				<label class="global-stat centered" :title="globalDailyCount">
+					{{ formattedGlobalDailyCount }}
+				</label>
 			</div>
 		</section>
 
@@ -80,10 +84,12 @@ export default {
 			"paxCounts"
 		] ),
 		formattedGlobalCountrywideCount() {
-			return numeral( this.globalCountrywideCount ).format( "0,0" );
+			const abbreviation = this.globalCountrywideCount < 1000 ? "0,0" : "0,0.0a";
+			return numeral( this.globalCountrywideCount ).format( abbreviation );
 		},
 		formattedGlobalDailyCount() {
-			return numeral( this.globalDailyCount ).format( "0,0" );
+			const abbreviation = this.globalDailyCount < 1000 ? "0,0" : "0,0.0a";
+			return numeral( this.globalDailyCount ).format( abbreviation );
 		},
 		formattedRegionCounts() {
 			return this.regionCounts.map( counts => {
@@ -162,8 +168,12 @@ export default {
 
 .global-stat {
 	flex: 1;
-	font-size: 5rem;
+	font-size: 3rem;
 	font-weight: bold;
+
+	@include media-tablet() {
+		font-size: 4.5vw;
+	}
 }
 
 .stat-table {
