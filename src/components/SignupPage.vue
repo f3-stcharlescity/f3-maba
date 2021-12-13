@@ -114,6 +114,9 @@
 			<Burpees :burpees="mergedBurpees"
 					 @change="onBurpeesChanged"
 			/>
+			<p class="centered">
+				<a class="daily-stats-link" href="/stats">Daily Stats</a>
+			</p>
 		</section>
 
 		<section class="subsection spread buttons">
@@ -295,5 +298,10 @@ export default {
 			}
 		}
 	}
+}
+
+.daily-stats-link {
+	display: inline-block;
+	margin-top: 2rem;
 }
 </style>
