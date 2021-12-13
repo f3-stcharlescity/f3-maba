@@ -1,19 +1,23 @@
 import { createRouter, createWebHistory } from "vue-router";
+import config from "@/config";
+import { today } from "@/lib/util";
 import SignupPage from "@/components/SignupPage";
 import StatsPage from "@/components/StatsPage";
+
+const { TARGET_YEAR, TARGET_MONTH, } = config;
 
 export default function ( { store } ) {
 	const routes = [
 		{
 			path: "/",
-			redirect: "/signup/2022",
+			redirect: `/signup/${ TARGET_YEAR }`,
 		},
 		//
 		// signup
 		//
 		{
 			path: "/signup",
-			redirect: "/signup/2022",
+			redirect: `/signup/${ TARGET_YEAR }`,
 		},
 		{
 			path: "/signup/:year",
@@ -32,7 +36,16 @@ export default function ( { store } ) {
 		//
 		{
 			path: "/stats",
-			redirect: "/stats/2022/01",
+			beforeEnter( to, from, next ) {
+				// got to stats for the FIRST of the month
+				let url = `/stats/${ TARGET_YEAR }/01`;
+				const { year, month, day } = today();
+				if ( year === TARGET_YEAR && month === TARGET_MONTH ) {
+					// go to stats for TODAY
+					url = `/stats/${ TARGET_YEAR }/${ day }`;
+				}
+				next( url );
+			}
 		},
 		{
 			path: "/stats/:year/:day",
