@@ -12,20 +12,15 @@
 				not do either one alone.</p>
 
 			<p>Sign up below.</p>
-		</section>
 
-		<!--
-		<section class="subsection centered">
-			<iframe
-				width="560"
-				height="315"
-				src="https://www.youtube.com/embed/pnqO8sh7ztc"
-				title="I did 100 BURPEES for 30 days. Here’s what happened."
-				frameborder="0"
-				allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-				allowfullscreen></iframe>
+			<div class="promo-video centered">
+				<iframe width="560"
+						height="315" src="https://www.youtube.com/embed/5q8mbKXzRZw" title="YouTube video player"
+						frameborder="0"
+						allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+						allowfullscreen></iframe>
+			</div>
 		</section>
-		-->
 
 		<section class="subsection">
 			<h2>Region</h2>
@@ -293,6 +288,7 @@ export default {
 		button {
 			margin-top: 0;
 			margin-right: 1rem;
+
 			&:last-of-type {
 				margin-right: 0;
 			}
@@ -303,5 +299,19 @@ export default {
 .daily-stats-link {
 	display: inline-block;
 	margin-top: 2rem;
+}
+
+.promo-video {
+	padding: 1.5rem 0;
+	background-color: black;
+	border-radius: 0.5rem;
+
+	iframe {
+		width: 100%;
+
+		@include media-tablet() {
+			width: 90%;
+		}
+	}
 }
 </style>
