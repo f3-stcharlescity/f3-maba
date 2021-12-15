@@ -277,7 +277,7 @@ export default {
 			try {
 				let selectedRegion = region;
 				let selectedHimId = "";
-				let burpees = pristineBurpees();
+				let burpees = pristineBurpees({year: state.year});
 
 				const himUrl = `/api/hims?region=${ selectedRegion }`;
 				const himResult = await axios.get( himUrl );
@@ -310,7 +310,7 @@ export default {
 		},
 		async changeHimStatus( { state, commit, }, status ) {
 			try {
-				let burpees = pristineBurpees();
+				let burpees = pristineBurpees({year: state.year});
 				const { selectedHimId, year, } = state;
 
 				if ( status === HIM_STATUS.EXISTING && selectedHimId ) {
@@ -347,6 +347,7 @@ export default {
 					const himResult = await axios.post( "/api/hims", body );
 					him = himResult.data;
 					selectedHimId = him.him_id;
+					notifyInfo( `Thanks for signing up ${ name }! In the future, choose your F3 name in the drop-down.` );
 				}
 
 				const burpeeURL = `/api/hims/${ selectedHimId }/burpees`;
