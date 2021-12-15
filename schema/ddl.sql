@@ -1,10 +1,11 @@
 create table hims
 (
-    him_id  uuid         not null,
-    f3_name varchar(100) not null,
-    region  varchar(100) not null,
-    ao      varchar(100),
-    email   varchar(100),
+    him_id     uuid         not null,
+    f3_name    varchar(100) not null,
+    region     varchar(100) not null,
+    ao         varchar(100),
+    email      varchar(100),
+    created_at date default date(now()),
     constraint hims_him_id_pk
         primary key (him_id)
 );
