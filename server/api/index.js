@@ -6,7 +6,7 @@ const db = require( "../data/db" );
 const regions = require( "../data/regions.json" );
 const { isEmailValid, isRegionValid } = require( "../validation" );
 
-const statsAPI = require("./stats");
+const statsAPI = require( "./stats" );
 
 const getRegions = ( req, res ) => {
 	res.json( regions );
@@ -34,11 +34,14 @@ const getHims = async ( req, res ) => {
 
 	const sqlQuery = sql.join( " " );
 	const client = await db.getClient();
-	const himsResult = await client.query( sqlQuery, sqlParams );
 
-	client.release( true );
+	try {
+		const himsResult = await client.query( sqlQuery, sqlParams );
 
-	return res.json( Array.from( himsResult.rows ) );
+		return res.json( Array.from( himsResult.rows ) );
+	} finally {
+		client.release( true );
+	}
 };
 
 const postHim = async ( req, res ) => {
@@ -56,20 +59,23 @@ const postHim = async ( req, res ) => {
 
 	const client = await db.getClient();
 
-	const himQuery = "select count(*) as hits from hims where region = $1 and lower(f3_name) = $2;";
-	const himValues = [ region, f3_name.toLowerCase() ];
-	const himResult = await client.query( himQuery, himValues );
-	if ( himResult.rows[ 0 ].hits > 0 ) {
-		return res.status( 409 ).send( `${ f3_name } has already signed up.` );
+	try {
+
+		const himQuery = "select count(*) as hits from hims where region = $1 and lower(f3_name) = $2;";
+		const himValues = [ region, f3_name.toLowerCase() ];
+		const himResult = await client.query( himQuery, himValues );
+		if ( himResult.rows[ 0 ].hits > 0 ) {
+			return res.status( 409 ).send( `${ f3_name } has already signed up.` );
+		}
+
+		const insertQuery = "insert into hims (him_id, region, ao, f3_name, email) values ($1, $2, $3, $4, $5) returning *;";
+		const insertValues = [ uuidv4(), region, "", f3_name, email ];
+		const insertResult = await client.query( insertQuery, insertValues );
+
+		return res.status( 201 ).json( insertResult.rows[ 0 ] );
+	} finally {
+		client.release( true );
 	}
-
-	const insertQuery = "insert into hims (him_id, region, ao, f3_name, email) values ($1, $2, $3, $4, $5) returning *;";
-	const insertValues = [ uuidv4(), region, "", f3_name, email ];
-	const insertResult = await client.query( insertQuery, insertValues );
-
-	client.release( true );
-
-	return res.status( 201 ).json( insertResult.rows[ 0 ] );
 };
 
 const getBurpees = async ( req, res ) => {
@@ -95,21 +101,26 @@ const getBurpees = async ( req, res ) => {
 	year = parseInt( `${ year }`, 10 );
 	const query = "select DATE(date), count from burpees where him_id = $1 and date_part('year', date) = $2 order by date asc;";
 	const values = [ himId, year ];
+
 	const client = await db.getClient();
-	const result = await client.query( query, values );
-	client.release( true );
 
-	const formattedRows = result.rows.map( row => {
-		return {
-			...row,
-			// @see https://node-postgres.com/features/types#date--timestamp--timestamptz
-			date: moment.tz( row.date, process.env.TZ ).format( "YYYY-MM-DD" ),
-		};
-	} );
+	try {
+		const result = await client.query( query, values );
 
-	const allBurpees = zeroFillBurpees( formattedRows );
+		const formattedRows = result.rows.map( row => {
+			return {
+				...row,
+				// @see https://node-postgres.com/features/types#date--timestamp--timestamptz
+				date: moment.tz( row.date, process.env.TZ ).format( "YYYY-MM-DD" ),
+			};
+		} );
 
-	return res.status( 200 ).json( allBurpees );
+		const allBurpees = zeroFillBurpees( formattedRows );
+
+		return res.status( 200 ).json( allBurpees );
+	} finally {
+		client.release( true );
+	}
 };
 
 const postBurpees = async ( req, res ) => {
@@ -129,18 +140,22 @@ const postBurpees = async ( req, res ) => {
 	const insertQuery = sql.join( " " );
 
 	const client = await db.getClient();
-	const insertResult = await client.query( insertQuery, values );
-	client.release( true );
 
-	const formattedRows = insertResult.rows.map( row => {
-		return {
-			...row,
-			// @see https://node-postgres.com/features/types#date--timestamp--timestamptz
-			date: moment.tz( row.date, process.env.TZ ).format( "YYYY-MM-DD" ),
-		};
-	} );
+	try {
+		const insertResult = await client.query( insertQuery, values );
 
-	return res.status( 201 ).json( formattedRows );
+		const formattedRows = insertResult.rows.map( row => {
+			return {
+				...row,
+				// @see https://node-postgres.com/features/types#date--timestamp--timestamptz
+				date: moment.tz( row.date, process.env.TZ ).format( "YYYY-MM-DD" ),
+			};
+		} );
+
+		return res.status( 201 ).json( formattedRows );
+	} finally {
+		client.release( true );
+	}
 };
 
 module.exports = function ( app ) {
