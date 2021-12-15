@@ -63,7 +63,7 @@ const uniq = ( arr ) => {
 	allAOs.NONE = [ "NONE" ];
 
 	console.info("writing AOs...");
-	fs.writeFile( path.join( DATA_ROOT, "aos.json" ), JSON.stringify( allAOs ), ( err ) => {
+	fs.writeFile( path.join( DATA_ROOT, "aos.json" ), JSON.stringify( allAOs, null, 2 ), ( err ) => {
 		if ( err ) {
 			console.error( err );
 			return process.exit( 1 );
