@@ -201,9 +201,7 @@ export default {
 					];
 				} );
 
-				selectedRegion = localStorage.getItem( "selectedRegion" ) || regions[ 0 ] || NONE_REGION;
-
-				console.info( { selectedHimId, selectedRegion } );
+				selectedRegion = localStorage.getItem( "selectedRegion" ) || NONE_REGION;
 
 				const himUrl = `/api/hims?region=${ selectedRegion }`;
 				const himResult = await axios.get( himUrl );
@@ -222,8 +220,6 @@ export default {
 					const burpeesResult = await axios.get( url );
 					burpees = burpeesResult.data;
 				}
-
-				console.info( { selectedHimId, selectedRegion } );
 
 				commit( "storeInitialized", {
 					year,
@@ -248,7 +244,7 @@ export default {
 					...state.regions,
 				];
 
-				const selectedRegion = regions[ 0 ] || NONE_REGION;
+				const selectedRegion = NONE_REGION;
 
 				const himUrl = `/api/hims?region=${ selectedRegion }`;
 				const himResult = await axios.get( himUrl );
