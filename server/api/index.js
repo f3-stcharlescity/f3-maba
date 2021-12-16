@@ -2,17 +2,13 @@ const { v4: uuidv4 } = require( "uuid" );
 const moment = require( "moment-timezone" );
 const range = require( "lodash/range" );
 const keyBy = require( "lodash/keyBy" );
-const uniq = require( "lodash/uniq" );
 const db = require( "../data/db" );
 const { isEmailValid, isRegionValid } = require( "../validation" );
-const regions = require( "../data/regions.json" );
-const regionsPatch = require( "../data/regions.patch.json" );
-const allRegions = uniq( regions.concat( regionsPatch ) ).sort();
-
+const regions = require("../data/regions");
 const statsAPI = require( "./stats" );
 
 const getRegions = ( req, res ) => {
-	res.json( allRegions );
+	res.json( regions );
 };
 
 const getHims = async ( req, res ) => {

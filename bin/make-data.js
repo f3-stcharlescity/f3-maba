@@ -3,7 +3,7 @@ const fs = require( "fs" );
 const path = require( "path" );
 
 const PROJECT_ROOT = path.resolve( __dirname, ".." );
-const DATA_ROOT = path.join( PROJECT_ROOT, "server", "data" );
+const DATA_ROOT = path.join( PROJECT_ROOT, "server", "data", "regions" );
 
 const f3MapURL = process.env.F3_MAP_URL;
 if ( !f3MapURL ) {
