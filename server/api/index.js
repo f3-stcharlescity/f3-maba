@@ -4,7 +4,7 @@ const range = require( "lodash/range" );
 const keyBy = require( "lodash/keyBy" );
 const db = require( "../data/db" );
 const { isEmailValid, isRegionValid } = require( "../validation" );
-const regions = require("../data/regions");
+const regions = require( "../data/regions" );
 const statsAPI = require( "./stats" );
 
 const getRegions = ( req, res ) => {
@@ -131,7 +131,7 @@ const postBurpees = async ( req, res ) => {
 	const values = [];
 	for ( const burpee of burpees ) {
 		const valueLength = values.length;
-		values.push( himId, burpee.date, burpee.count );
+		values.push( himId, burpee.date, Math.abs( burpee.count ) );
 		valuesSql.push( `($${ valueLength + 1 }, $${ valueLength + 2 }, $${ valueLength + 3 })` );
 	}
 	sql.push( valuesSql.join( ", " ) );
