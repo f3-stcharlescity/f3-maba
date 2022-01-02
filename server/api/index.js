@@ -7,9 +7,17 @@ const { isEmailValid, isRegionValid } = require( "../validation" );
 const regions = require( "../data/regions" );
 const statsAPI = require( "./stats" );
 
+//
+// REGIONS
+//
+
 const getRegions = ( req, res ) => {
 	res.json( regions );
 };
+
+//
+// HIMS
+//
 
 const getHims = async ( req, res ) => {
 	const { query, } = req;
@@ -77,24 +85,27 @@ const postHim = async ( req, res ) => {
 	}
 };
 
+//
+// BURPEES
+//
+
+const zeroFillBurpees = ( formattedRows, year ) => {
+	const rowsByDate = keyBy( formattedRows, "date" );
+	const allBurpees = [];
+	const daysInJanuary = 31;
+	const padZero = n => n < 10 ? `0${ n }` : `${ n }`;
+	for ( const day of range( 1, daysInJanuary + 1 ) ) {
+		const date = `${ year }-01-${ padZero( day ) }`;
+		const row = rowsByDate[ date ] || {
+			date,
+			count: 0,
+		};
+		allBurpees.push( row );
+	}
+	return allBurpees;
+};
+
 const getBurpees = async ( req, res ) => {
-
-	const zeroFillBurpees = ( formattedRows ) => {
-		const rowsByDate = keyBy( formattedRows, "date" );
-		const allBurpees = [];
-		const daysInJanuary = 31;
-		const padZero = n => n < 10 ? `0${ n }` : `${ n }`;
-		for ( const day of range( 1, daysInJanuary + 1 ) ) {
-			const date = `${ year }-01-${ padZero( day ) }`;
-			const row = rowsByDate[ date ] || {
-				date,
-				count: 0,
-			};
-			allBurpees.push( row );
-		}
-		return allBurpees;
-	};
-
 	const { himId } = req.params;
 	let { year = moment().year() } = req.query;
 	year = parseInt( `${ year }`, 10 );
@@ -114,7 +125,7 @@ const getBurpees = async ( req, res ) => {
 			};
 		} );
 
-		const allBurpees = zeroFillBurpees( formattedRows );
+		const allBurpees = zeroFillBurpees( formattedRows, year );
 
 		return res.status( 200 ).json( allBurpees );
 	} finally {
@@ -124,7 +135,10 @@ const getBurpees = async ( req, res ) => {
 
 const postBurpees = async ( req, res ) => {
 	const { himId } = req.params;
-	const burpees = req.body;
+	let { year = moment().year() } = req.query;
+	year = parseInt( `${ year }`, 10 );
+	const allBurpees = req.body || [];
+	const burpees = allBurpees.filter( burpee => burpee.count !== 0 );
 
 	const sql = [ "insert into burpees (him_id, date, count) values" ];
 	const valuesSql = [];
@@ -151,7 +165,9 @@ const postBurpees = async ( req, res ) => {
 			};
 		} );
 
-		return res.status( 201 ).json( formattedRows );
+		const allBurpees = zeroFillBurpees( formattedRows, year );
+
+		return res.status( 201 ).json( allBurpees );
 	} finally {
 		client.release( true );
 	}
