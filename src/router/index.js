@@ -1,11 +1,6 @@
-import { defineAsyncComponent } from "vue";
 import { createRouter, createWebHistory } from "vue-router";
 import config from "@/config";
 import { today } from "@/lib/util";
-
-// @see: https://www.ditdot.hr/en/code-splitting-in-vue-js
-const AsyncSignupPage = defineAsyncComponent( () => import("../components/SignupPage") );
-const AsyncStatsPage = defineAsyncComponent( () => import("../components/StatsPage") );
 
 const { TARGET_YEAR, TARGET_MONTH, } = config;
 
@@ -25,7 +20,7 @@ export default function ( { store } ) {
 		{
 			path: "/signup/:year",
 			name: "signup",
-			component: AsyncSignupPage,
+			component: () => import("../components/SignupPage"),
 			beforeEnter( to, from, next ) {
 				const { params } = to;
 				const { year } = params;
@@ -53,7 +48,7 @@ export default function ( { store } ) {
 		{
 			path: "/stats/:year/:day",
 			name: "stats",
-			component: AsyncStatsPage,
+			component: () => import("../components/StatsPage"),
 			beforeEnter( to, from, next ) {
 				const { params } = to;
 				const { year, day, } = params;
