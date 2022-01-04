@@ -76,7 +76,7 @@
 					<td>{{ counts.count }}</td>
 				</tr>
 			</table>
-			<p class="centered" v-else>No PAX have posted burpees yet. Your region's PAX can sign up <a href="/signup">here</a>.</p>
+			<p class="centered" v-else>No PAX have posted burpees for {{ formattedShortDate }} yet. Your region's PAX can sign up <a href="/signup">here</a>.</p>
 		</section>
 
 		<section class="subsection">
