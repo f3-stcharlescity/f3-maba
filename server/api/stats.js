@@ -47,10 +47,11 @@ const getTopRegionStats = async ( req, res ) => {
 	try {
 		const regionQuery = `
             select h.region,
+                   h1.pax,
                    sum(b1.cumulative_burpee_count) as cumulative_burpee_count,
                    sum(b2.daily_burpee_count)      as daily_burpee_count
             from hims as h
-            join (
+                     join (
                 select him_id, sum(burpees.count) as cumulative_burpee_count
                 from burpees
                 where date_part('year', date) = $1
@@ -66,7 +67,12 @@ const getTopRegionStats = async ( req, res ) => {
                   and date_part('day', date) = $3
                 group by him_id
             ) as b2 on b2.him_id = h.him_id
-            group by h.region
+                     join (
+                select region, count(distinct email) as pax
+                from hims
+                group by region
+            ) as h1 on h.region = h1.region
+            group by h.region, h1.pax
             order by cumulative_burpee_count desc
             limit 10;
 		`;
@@ -76,6 +82,7 @@ const getTopRegionStats = async ( req, res ) => {
 		return res.json( regionResults.rows.map( row => {
 			return {
 				...row,
+				pax: parseInt( row.pax, 10 ),
 				cumulative_burpee_count: parseInt( row.cumulative_burpee_count, 10 ),
 				daily_burpee_count: parseInt( row.daily_burpee_count, 10 ),
 			};
@@ -99,7 +106,7 @@ const getPaxStats = async ( req, res ) => {
                    h.f3_name as him,
                    b1.cumulative_burpee_count
             from hims as h
-            join (
+                     join (
                 select him_id, sum(burpees.count) as cumulative_burpee_count
                 from burpees
                 where date_part('year', date) = $1
@@ -125,7 +132,7 @@ const getPaxStats = async ( req, res ) => {
                    h.f3_name as him,
                    b2.daily_burpee_count
             from hims as h
-            join (
+                     join (
                 select him_id, sum(burpees.count) as daily_burpee_count
                 from burpees
                 where date_part('year', date) = $1
@@ -144,7 +151,7 @@ const getPaxStats = async ( req, res ) => {
 				...row,
 				count: parseInt( row.daily_burpee_count, 10 ),
 			};
-		} )
+		} );
 
 		return res.json( {
 			top,

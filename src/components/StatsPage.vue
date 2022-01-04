@@ -31,12 +31,14 @@
 			<table class="stat-table regions-table" v-if="formattedRegionCounts.length">
 				<tr>
 					<th>Region</th>
+					<th>PAX</th>
 					<th>Cumulative Count</th>
 					<th>{{ formattedShortDate }} Count</th>
 					<!-- <th>Chart</th> -->
 				</tr>
 				<tr v-for="counts in formattedRegionCounts" :key="counts.region">
 					<td>{{ counts.region }}</td>
+					<td>{{ counts.pax }}</td>
 					<td>{{ counts.cumulative_burpee_count }}</td>
 					<td>{{ counts.daily_burpee_count }}</td>
 					<!-- <td>TBD</td> -->
@@ -231,7 +233,7 @@ export default {
 
 .regions-table {
 	td, th {
-		width: 33%;
+		width: 25%;
 
 		@include media-tablet() {
 			width: auto;
@@ -241,7 +243,7 @@ export default {
 
 .pax-table {
 	td, th {
-		width: 25%;
+		width: 33%;
 
 		@include media-tablet() {
 			width: auto;
