@@ -3,7 +3,7 @@
 		<section class="subsection global-stats-container tablet">
 			<div class="global-stats">
 				<h2 class="global-stat-header centered">Countrywide Cumulative Burpees &mdash;<br/>Month to Date</h2>
-				<h2 class="global-stat-header centered">Today's Burpee Count</h2>
+				<h2 class="global-stat-header centered">{{ formattedShortDate }} Count</h2>
 			</div>
 			<div class="global-stats">
 				<label class="global-stat centered" :title="globalCountrywideCount">
@@ -21,18 +21,18 @@
 				<label class="global-stat centered">{{ formattedGlobalCountrywideCount }}</label>
 			</div>
 			<div class="global-stats">
-				<h2 class="global-stat-header centered">Today's Burpee Count</h2>
+				<h2 class="global-stat-header centered">{{ formattedShortDate }} Count</h2>
 				<label class="global-stat centered">{{ formattedGlobalDailyCount }}</label>
 			</div>
 		</section>
 
 		<section class="subsection">
-			<h2 class="centered">Region Leaderboard</h2>
+			<h2 class="centered">Region Leaderboard (Month to Date)</h2>
 			<table class="stat-table regions-table" v-if="formattedRegionCounts.length">
 				<tr>
 					<th>Region</th>
-					<th>Cumulative Burpee Count</th>
-					<th>Today's Burpee Count</th>
+					<th>Cumulative Count</th>
+					<th>{{ formattedShortDate }} Count</th>
 					<!-- <th>Chart</th> -->
 				</tr>
 				<tr v-for="counts in formattedRegionCounts" :key="counts.region">
@@ -46,19 +46,34 @@
 		</section>
 
 		<section class="subsection">
-			<h2 class="centered">Top PAX</h2>
-			<table class="stat-table pax-table" v-if="formattedPaxCounts.length">
+			<h2 class="centered">Top PAX (Month to Date)</h2>
+			<table class="stat-table pax-table" v-if="formattedTopPaxCounts.length">
 				<tr>
 					<th>HIM</th>
 					<th>Region</th>
-					<th>Cumulative Burpee Count</th>
-					<th>Today's Burpee Count</th>
+					<th>Cumulative Count</th>
 				</tr>
-				<tr v-for="counts in formattedPaxCounts" :key="counts.him">
+				<tr v-for="counts in formattedTopPaxCounts" :key="counts.him">
 					<td>{{ counts.him }}</td>
 					<td>{{ counts.region }}</td>
-					<td>{{ counts.cumulative_burpee_count }}</td>
-					<td>{{ counts.daily_burpee_count }}</td>
+					<td>{{ counts.count }}</td>
+				</tr>
+			</table>
+			<p class="centered" v-else>No PAX have posted burpees yet. Your region's PAX can sign up <a href="/signup">here</a>.</p>
+		</section>
+
+		<section class="subsection">
+			<h2 class="centered">Top PAX ({{ formattedShortDate }})</h2>
+			<table class="stat-table pax-table" v-if="formattedDailyPaxCounts.length">
+				<tr>
+					<th>HIM</th>
+					<th>Region</th>
+					<th>Cumulative Count</th>
+				</tr>
+				<tr v-for="counts in formattedDailyPaxCounts" :key="counts.him">
+					<td>{{ counts.him }}</td>
+					<td>{{ counts.region }}</td>
+					<td>{{ counts.count }}</td>
 				</tr>
 			</table>
 			<p class="centered" v-else>No PAX have posted burpees yet. Your region's PAX can sign up <a href="/signup">here</a>.</p>
@@ -87,7 +102,9 @@ export default {
 			"globalCountrywideCount",
 			"globalDailyCount",
 			"regionCounts",
-			"paxCounts"
+			"topPaxCounts",
+			"dailyPaxCounts",
+			"formattedShortDate",
 		] ),
 		formattedGlobalCountrywideCount() {
 			const abbreviation = this.globalCountrywideCount < 1000 ? "0,0" : "0,0.0a";
@@ -108,13 +125,20 @@ export default {
 				};
 			} );
 		},
-		formattedPaxCounts() {
-			return this.paxCounts.map( counts => {
+		formattedTopPaxCounts() {
+			return this.topPaxCounts.map( counts => {
 				return {
 					...counts,
-					cumulative_burpee_count: numeral( counts.cumulative_burpee_count )
+					count: numeral( counts.count )
 						.format( "0,0" ),
-					daily_burpee_count: numeral( counts.daily_burpee_count )
+				};
+			} );
+		},
+		formattedDailyPaxCounts() {
+			return this.dailyPaxCounts.map( counts => {
+				return {
+					...counts,
+					count: numeral( counts.count )
 						.format( "0,0" ),
 				};
 			} );

@@ -55,7 +55,7 @@ const getTopRegionStats = async ( req, res ) => {
               and date_part('day', date) <= $3
             group by him_id
         ) as b1 on b1.him_id = h.him_id
-                 join (
+        left outer join (
             select him_id, sum(burpees.count) as daily_burpee_count
             from burpees
             where date_part('year', date) = $1
@@ -81,19 +81,20 @@ const getTopRegionStats = async ( req, res ) => {
 	} ) );
 };
 
-const getTopPaxStats = async ( req, res ) => {
+const getPaxStats = async ( req, res ) => {
 
 	const { year, month, day } = req.params;
 
 	const client = await db.getClient();
 
-	const paxQuery = `
+	const paxParams = [ year, month, day ];
+
+	const topPaxQuery = `
         select h.region,
                h.f3_name as him,
-               b1.cumulative_burpee_count,
-               b2.daily_burpee_count
+               b1.cumulative_burpee_count
         from hims as h
-                 join (
+        join (
             select him_id, sum(burpees.count) as cumulative_burpee_count
             from burpees
             where date_part('year', date) = $1
@@ -101,7 +102,24 @@ const getTopPaxStats = async ( req, res ) => {
               and date_part('day', date) <= $3
             group by him_id
         ) as b1 on b1.him_id = h.him_id
-                 join (
+        group by h.region, h.f3_name, cumulative_burpee_count
+        order by cumulative_burpee_count desc
+        limit 10;
+	`;
+
+	const topPaxResults = await client.query( topPaxQuery, paxParams );
+	const top = topPaxResults.rows.map( row => {
+		return {
+			...row,
+			count: parseInt( row.cumulative_burpee_count, 10 ), };
+	} );
+
+	const dailyPaxQuery = `
+        select h.region,
+               h.f3_name as him,
+               b2.daily_burpee_count
+        from hims as h
+		join (
             select him_id, sum(burpees.count) as daily_burpee_count
             from burpees
             where date_part('year', date) = $1
@@ -109,26 +127,29 @@ const getTopPaxStats = async ( req, res ) => {
               and date_part('day', date) = $3
             group by him_id
         ) as b2 on b2.him_id = h.him_id
-        group by h.region, h.f3_name, cumulative_burpee_count, daily_burpee_count
-        order by cumulative_burpee_count desc
+        group by h.region, h.f3_name, daily_burpee_count
+        order by daily_burpee_count desc
         limit 10;
 	`;
-	const paxParams = [ year, month, day ];
-	const paxResults = await client.query( paxQuery, paxParams );
+
+	const dailyPaxResults = await client.query( dailyPaxQuery, paxParams );
+	const daily = dailyPaxResults.rows.map( row => {
+		return {
+			...row,
+			count: parseInt( row.daily_burpee_count, 10 ),
+		};
+	} )
 
 	client.release( true );
 
-	return res.json( paxResults.rows.map( row => {
-		return {
-			...row,
-			cumulative_burpee_count: parseInt( row.cumulative_burpee_count, 10 ),
-			daily_burpee_count: parseInt( row.daily_burpee_count, 10 ),
-		};
-	} ) );
+	return res.json( {
+		top,
+		daily,
+	} );
 };
 
 module.exports = function ( app ) {
 	app.get( "/api/stats/:year/:month/:day/global", getGlobalStats );
 	app.get( "/api/stats/:year/:month/:day/regions", getTopRegionStats );
-	app.get( "/api/stats/:year/:month/:day/pax", getTopPaxStats );
+	app.get( "/api/stats/:year/:month/:day/pax", getPaxStats );
 };

@@ -1,10 +1,12 @@
 import axios from "axios";
+import moment from "moment-timezone";
 import {
 	notifySuccess,
 	notifyInfo,
 	notifyError,
 	notifyUnknownError,
 } from "./notify";
+import { padZero } from "../../lib/util";
 
 const BURPEE_MONTH = "01";
 
@@ -15,7 +17,8 @@ const pristineState = () => {
 		globalCountrywideCount: 0,
 		globalDailyCount: 0,
 		regionCounts: [],
-		paxCounts: [],
+		topPaxCounts: [],
+		dailyPaxCounts: [],
 	};
 };
 
@@ -23,18 +26,37 @@ export default {
 	namespaced: true,
 	state: pristineState(),
 	getters: {
+		formattedShortDate: _ => {
+			const { pathname } = window.location;
+			const pathParts = pathname.split( "/" );
+			const year = pathParts[ 2 ];
+			const day = pathParts[ 3 ];
+			const date = `${ year }-01-${ padZero( day ) }`;
+			console.info( ">>>", date );
+			return moment( date ).format( "MMMM Do" );
+		},
 		globalCountrywideCount: state => state.globalCountrywideCount,
 		globalDailyCount: state => state.globalDailyCount,
 		regionCounts: state => state.regionCounts,
-		paxCounts: state => state.paxCounts,
+		topPaxCounts: state => state.topPaxCounts,
+		dailyPaxCounts: state => state.dailyPaxCounts,
 	},
 	mutations: {
-		storeInitialized( state, { year, day, globalCountrywideCount, globalDailyCount, regionCounts, paxCounts, } ) {
+		storeInitialized( state, {
+			year,
+			day,
+			globalCountrywideCount,
+			globalDailyCount,
+			regionCounts,
+			topPaxCounts,
+			dailyPaxCounts,
+		} ) {
 			Object.assign( state, pristineState( { year, day, } ) );
 			state.globalCountrywideCount = globalCountrywideCount;
 			state.globalDailyCount = globalDailyCount;
 			state.regionCounts = regionCounts;
-			state.paxCounts = paxCounts;
+			state.topPaxCounts = topPaxCounts;
+			state.dailyPaxCounts = dailyPaxCounts;
 		},
 	},
 	actions: {
@@ -49,7 +71,8 @@ export default {
 
 				const globalCounts = statsResults[ 0 ].data;
 				const regionCounts = statsResults[ 1 ].data;
-				const paxCounts = statsResults[ 2 ].data;
+				const topPaxCounts = statsResults[ 2 ].data.top;
+				const dailyPaxCounts = statsResults[ 2 ].data.daily;
 
 				commit( "storeInitialized", {
 					year,
@@ -57,7 +80,8 @@ export default {
 					globalCountrywideCount: globalCounts.cumulative_burpee_count,
 					globalDailyCount: globalCounts.daily_burpee_count,
 					regionCounts,
-					paxCounts,
+					topPaxCounts,
+					dailyPaxCounts,
 				} );
 			} catch ( e ) {
 				notifyUnknownError( e );
