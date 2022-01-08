@@ -19,6 +19,7 @@ const pristineState = () => {
 		regionCounts: [],
 		topPaxCounts: [],
 		dailyPaxCounts: [],
+		regions: [],
 	};
 };
 
@@ -43,6 +44,7 @@ export default {
 		regionCounts: state => state.regionCounts,
 		topPaxCounts: state => state.topPaxCounts,
 		dailyPaxCounts: state => state.dailyPaxCounts,
+		regions: state => state.regions,
 	},
 	mutations: {
 		storeInitialized( state, {
@@ -53,6 +55,7 @@ export default {
 			regionCounts,
 			topPaxCounts,
 			dailyPaxCounts,
+			regions,
 		} ) {
 			Object.assign( state, pristineState( { year, day, } ) );
 			state.globalCountrywideCount = globalCountrywideCount;
@@ -60,6 +63,7 @@ export default {
 			state.regionCounts = regionCounts;
 			state.topPaxCounts = topPaxCounts;
 			state.dailyPaxCounts = dailyPaxCounts;
+			state.regions = regions;
 		},
 	},
 	actions: {
@@ -70,12 +74,14 @@ export default {
 					axios.get( `/api/stats/${ year }/${ BURPEE_MONTH }/${ day }/global?region=${ region }` ),
 					axios.get( `/api/stats/${ year }/${ BURPEE_MONTH }/${ day }/regions` ),
 					axios.get( `/api/stats/${ year }/${ BURPEE_MONTH }/${ day }/pax?region=${ region }` ),
+					axios.get("/api/regions" ),
 				] );
 
 				const globalCounts = statsResults[ 0 ].data;
 				const regionCounts = statsResults[ 1 ].data;
 				const topPaxCounts = statsResults[ 2 ].data.top;
 				const dailyPaxCounts = statsResults[ 2 ].data.daily;
+				const regions = statsResults[ 3 ].data;
 
 				commit( "storeInitialized", {
 					year,
@@ -85,6 +91,7 @@ export default {
 					regionCounts,
 					topPaxCounts,
 					dailyPaxCounts,
+					regions,
 				} );
 			} catch ( e ) {
 				notifyUnknownError( e );

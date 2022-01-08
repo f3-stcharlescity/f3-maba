@@ -1,12 +1,14 @@
 <template>
 	<MABAForm>
 		<section class="subsection" v-if="region">
-			<p class="centered">You are viewing stats for <strong>{{ region }}</strong>. Click <a href="/stats">here</a> to return to the global leader board.</p>
+			<p class="centered">You are viewing stats for <strong>{{ region }}</strong>. Click <a href="/stats">here</a>
+				to return to the global leader board.</p>
 		</section>
 
 		<section class="subsection global-stats-container tablet">
 			<div class="global-stats">
-				<h2 class="global-stat-header centered">{{ formattedGlobalAreaName }} Cumulative Burpees &mdash;<br/>Month to Date</h2>
+				<h2 class="global-stat-header centered">{{ formattedGlobalAreaName }} Cumulative Burpees &mdash;<br/>Month
+					to Date</h2>
 				<h2 class="global-stat-header centered">{{ formattedShortDate }} Count</h2>
 			</div>
 			<div class="global-stats">
@@ -21,7 +23,8 @@
 
 		<section class="subsection global-stats-container mobile">
 			<div class="global-stats">
-				<h2 class="global-stat-header centered">{{ formattedGlobalAreaName }} Cumulative Burpees &mdash;<br/>Month to Date</h2>
+				<h2 class="global-stat-header centered">{{ formattedGlobalAreaName }} Cumulative Burpees &mdash;<br/>Month
+					to Date</h2>
 				<label class="global-stat centered">{{ formattedGlobalCountrywideCount }}</label>
 			</div>
 			<div class="global-stats">
@@ -50,7 +53,8 @@
 					<!-- <td>TBD</td> -->
 				</tr>
 			</table>
-			<p class="centered" v-else>No regions have posted burpees yet. Your region's PAX can sign up <a href="/signup">here</a>.</p>
+			<p class="centered" v-else>No regions have posted burpees yet. Your region's PAX can sign up <a
+				href="/signup">here</a>.</p>
 		</section>
 
 		<section class="subsection">
@@ -69,7 +73,8 @@
 					<td>{{ counts.count }}</td>
 				</tr>
 			</table>
-			<p class="centered" v-else>No PAX have posted burpees yet. Your region's PAX can sign up <a href="/signup">here</a>.</p>
+			<p class="centered" v-else>No PAX have posted burpees yet. Your region's PAX can sign up <a href="/signup">here</a>.
+			</p>
 		</section>
 
 		<section class="subsection">
@@ -88,7 +93,23 @@
 					<td>{{ counts.count }}</td>
 				</tr>
 			</table>
-			<p class="centered" v-else>No PAX have posted burpees for {{ formattedShortDate }} yet. Your region's PAX can sign up <a href="/signup">here</a>.</p>
+			<p class="centered" v-else>No PAX have posted burpees for {{ formattedShortDate }} yet. Your region's PAX
+				can sign up <a href="/signup">here</a>.</p>
+		</section>
+
+		<section class="subsection region-leaderboard-section" v-if="!region">
+			<select
+				@change="onStatRegionChange"
+			>
+				<option
+					v-for="statRegion in regions"
+					:key="statRegion"
+					:value="statRegion">{{ statRegion }}
+				</option>
+			</select>
+			<button
+				@click="onOpenRegionClicked"
+			>Open region leaderboard</button>
 		</section>
 
 		<section class="subsection">
@@ -109,9 +130,15 @@ export default {
 	components: {
 		MABAForm,
 	},
+	data() {
+		return {
+			selectedStatRegion: "",
+		};
+	},
 	computed: {
 		...mapGetters( "statsPage", [
 			"region",
+			"regions",
 			"globalCountrywideCount",
 			"globalDailyCount",
 			"regionCounts",
@@ -159,6 +186,15 @@ export default {
 				};
 			} );
 		},
+	},
+	methods: {
+		onStatRegionChange( e ) {
+			this.selectedStatRegion = e.target.selectedOptions[ 0 ].value;
+		},
+		onOpenRegionClicked() {
+			const region = this.selectedStatRegion || this.regions[ 0 ];
+			window.location.assign( `?region=${ region }` );
+		}
 	}
 };
 </script>
@@ -250,6 +286,27 @@ export default {
 .pax-table {
 	td, th {
 		width: 33%;
+	}
+}
+
+.region-leaderboard-section {
+	display: flex;
+	flex-direction: column;
+
+	@include media-tablet() {
+		flex-direction: row;
+	}
+
+	select {
+		margin-bottom: 0.5rem;
+		margin-right: unset;
+		width: 100%;
+
+		@include media-tablet() {
+			margin-right: 0.5rem;
+			margin-bottom: unset;
+			width: unset;
+		}
 	}
 }
 </style>
