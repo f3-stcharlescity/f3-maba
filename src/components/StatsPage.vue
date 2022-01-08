@@ -1,5 +1,9 @@
 <template>
 	<MABAForm>
+		<section class="subsection" v-if="region">
+			<p class="centered">You are viewing stats for <strong>{{ region }}</strong>. Click <a href="/stats">here</a> to return to the global leader board.</p>
+		</section>
+
 		<section class="subsection global-stats-container tablet">
 			<div class="global-stats">
 				<h2 class="global-stat-header centered">{{ formattedGlobalAreaName }} Cumulative Burpees &mdash;<br/>Month to Date</h2>
