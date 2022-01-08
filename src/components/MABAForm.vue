@@ -85,6 +85,10 @@ export default {
 	*.centered {
 		text-align: center;
 	}
+
+	a {
+		color: tomato;
+	}
 }
 
 .maba-form__banner {

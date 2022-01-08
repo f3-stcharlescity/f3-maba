@@ -2,30 +2,44 @@ const db = require( "../data/db" );
 
 const getGlobalStats = async ( req, res ) => {
 	const { year, month, day } = req.params;
+	const { region, } = req.query;
 
 	const client = await db.getClient();
 
+	const cumulativeParams = [ year, month, day ];
+	const dailyParams = [ year, month, day ];
+
+	let whereClause = "";
+	if ( region ) {
+		whereClause = "and h.region = $4";
+		cumulativeParams.push( region );
+		dailyParams.push( region );
+	}
+
 	try {
 		const cumulativeQuery = `
-            select sum(count) as cumulative_burpee_count
-            from burpees
-            where date_part('year', date) = $1
-              and date_part('month', date) = $2
-              and date_part('day', date) <= $3;
+            select sum(b.count) as cumulative_burpee_count
+            from burpees as b
+            join hims as h on b.him_id = h.him_id
+            where date_part('year', b.date) = $1
+              and date_part('month', b.date) = $2
+              and date_part('day', b.date) <= $3
+			  ${whereClause};
 		`;
 
-		const cumulativeParams = [ year, month, day ];
 		const cumulativeResults = await client.query( cumulativeQuery, cumulativeParams );
 		const { cumulative_burpee_count } = cumulativeResults.rows[ 0 ];
 
 		const dailyQuery = `
-            select sum(burpees.count) as daily_burpee_count
-            from burpees
-            where date_part('year', date) = $1
-              and date_part('month', date) = $2
-              and date_part('day', date) = $3;
+            select sum(b.count) as daily_burpee_count
+            from burpees as b
+            join hims as h on b.him_id = h.him_id
+            where date_part('year', b.date) = $1
+              and date_part('month', b.date) = $2
+              and date_part('day', b.date) = $3
+			  ${whereClause};
 		`;
-		const dailyParams = [ year, month, day ];
+
 		const dailyResults = await client.query( dailyQuery, dailyParams );
 		const { daily_burpee_count } = dailyResults.rows[ 0 ];
 
@@ -73,7 +87,7 @@ const getTopRegionStats = async ( req, res ) => {
                 group by region
             ) as h1 on h.region = h1.region
             group by h.region, h1.pax
-            order by cumulative_burpee_count desc
+            order by cumulative_burpee_count desc, h.region asc
             limit 10;
 		`;
 		const regionParams = [ year, month, day ];
@@ -95,18 +109,27 @@ const getTopRegionStats = async ( req, res ) => {
 const getPaxStats = async ( req, res ) => {
 
 	const { year, month, day } = req.params;
+	const { region, } = req.query;
 
 	const client = await db.getClient();
 
 	try {
-		const paxParams = [ year, month, day ];
+		const paxParams = [ year, month, day, ];
 
-		const topPaxQuery = `
+		let whereClause = "";
+		let limitClause = "limit 10";
+		if ( region ) {
+			whereClause = "where h.region = $4";
+			limitClause = "";
+			paxParams.push( region );
+		}
+
+		let topPaxQuery = `
             select h.region,
                    h.f3_name as him,
                    b1.cumulative_burpee_count
             from hims as h
-                     join (
+            join (
                 select him_id, sum(burpees.count) as cumulative_burpee_count
                 from burpees
                 where date_part('year', date) = $1
@@ -114,9 +137,10 @@ const getPaxStats = async ( req, res ) => {
                   and date_part('day', date) <= $3
                 group by him_id
             ) as b1 on b1.him_id = h.him_id
+            ${whereClause}
             group by h.region, h.f3_name, cumulative_burpee_count
-            order by cumulative_burpee_count desc
-            limit 10;
+            order by cumulative_burpee_count desc, h.f3_name asc
+            ${limitClause};
 		`;
 
 		const topPaxResults = await client.query( topPaxQuery, paxParams );
@@ -140,9 +164,10 @@ const getPaxStats = async ( req, res ) => {
                   and date_part('day', date) = $3
                 group by him_id
             ) as b2 on b2.him_id = h.him_id
+            ${whereClause}
             group by h.region, h.f3_name, daily_burpee_count
-            order by daily_burpee_count desc
-            limit 10;
+            order by daily_burpee_count desc, h.f3_name asc
+            ${limitClause};
 		`;
 
 		const dailyPaxResults = await client.query( dailyPaxQuery, paxParams );

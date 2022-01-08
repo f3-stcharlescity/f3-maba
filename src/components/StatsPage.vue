@@ -2,7 +2,7 @@
 	<MABAForm>
 		<section class="subsection global-stats-container tablet">
 			<div class="global-stats">
-				<h2 class="global-stat-header centered">Countrywide Cumulative Burpees &mdash;<br/>Month to Date</h2>
+				<h2 class="global-stat-header centered">{{ formattedGlobalAreaName }} Cumulative Burpees &mdash;<br/>Month to Date</h2>
 				<h2 class="global-stat-header centered">{{ formattedShortDate }} Count</h2>
 			</div>
 			<div class="global-stats">
@@ -17,7 +17,7 @@
 
 		<section class="subsection global-stats-container mobile">
 			<div class="global-stats">
-				<h2 class="global-stat-header centered">Countrywide Cumulative Burpees &mdash;<br/>Month to Date</h2>
+				<h2 class="global-stat-header centered">{{ formattedGlobalAreaName }} Cumulative Burpees &mdash;<br/>Month to Date</h2>
 				<label class="global-stat centered">{{ formattedGlobalCountrywideCount }}</label>
 			</div>
 			<div class="global-stats">
@@ -26,7 +26,7 @@
 			</div>
 		</section>
 
-		<section class="subsection">
+		<section class="subsection" v-if="!region">
 			<h2 class="centered">Region Leaderboard (Month to Date)</h2>
 			<table class="stat-table regions-table" v-if="formattedRegionCounts.length">
 				<tr>
@@ -37,7 +37,9 @@
 					<!-- <th>Chart</th> -->
 				</tr>
 				<tr v-for="counts in formattedRegionCounts" :key="counts.region">
-					<td>{{ counts.region }}</td>
+					<td>
+						<a :href="`?region=${ counts.region }`" :title="counts.region">{{ counts.region }}</a>
+					</td>
 					<td>{{ counts.pax }}</td>
 					<td>{{ counts.cumulative_burpee_count }}</td>
 					<td>{{ counts.daily_burpee_count }}</td>
@@ -57,7 +59,9 @@
 				</tr>
 				<tr v-for="counts in formattedTopPaxCounts" :key="counts.him">
 					<td>{{ counts.him }}</td>
-					<td>{{ counts.region }}</td>
+					<td>
+						<a :href="`?region=${ counts.region }`" :title="counts.region">{{ counts.region }}</a>
+					</td>
 					<td>{{ counts.count }}</td>
 				</tr>
 			</table>
@@ -74,7 +78,9 @@
 				</tr>
 				<tr v-for="counts in formattedDailyPaxCounts" :key="counts.him">
 					<td>{{ counts.him }}</td>
-					<td>{{ counts.region }}</td>
+					<td>
+						<a :href="`?region=${ counts.region }`" :title="counts.region">{{ counts.region }}</a>
+					</td>
 					<td>{{ counts.count }}</td>
 				</tr>
 			</table>
@@ -101,6 +107,7 @@ export default {
 	},
 	computed: {
 		...mapGetters( "statsPage", [
+			"region",
 			"globalCountrywideCount",
 			"globalDailyCount",
 			"regionCounts",
@@ -108,6 +115,9 @@ export default {
 			"dailyPaxCounts",
 			"formattedShortDate",
 		] ),
+		formattedGlobalAreaName() {
+			return this.region || "Countrywide";
+		},
 		formattedGlobalCountrywideCount() {
 			const abbreviation = this.globalCountrywideCount < 1000 ? "0,0" : "0,0.0a";
 			return numeral( this.globalCountrywideCount ).format( abbreviation );
@@ -223,31 +233,19 @@ export default {
 
 	td, th {
 		text-align: center;
-		padding: 0.2rem;
-
-		@include media-tablet() {
-			padding: 0.5rem;
-		}
+		padding: 0.5rem;
 	}
 }
 
 .regions-table {
 	td, th {
 		width: 25%;
-
-		@include media-tablet() {
-			width: auto;
-		}
 	}
 }
 
 .pax-table {
 	td, th {
 		width: 33%;
-
-		@include media-tablet() {
-			width: auto;
-		}
 	}
 }
 </style>

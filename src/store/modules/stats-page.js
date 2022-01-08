@@ -26,6 +26,10 @@ export default {
 	namespaced: true,
 	state: pristineState(),
 	getters: {
+		region: _ => {
+			const windowURL = new URL( window.location.toString() );
+			return ( windowURL.searchParams.get( "region" ) || "" ).trim();
+		},
 		formattedShortDate: _ => {
 			const { pathname } = window.location;
 			const pathParts = pathname.split( "/" );
@@ -60,13 +64,13 @@ export default {
 		},
 	},
 	actions: {
-		async initializeStore( { commit }, { year, day, } ) {
+		async initializeStore( { commit, getters }, { year, day, } ) {
 			try {
-
+				const { region } = getters;
 				const statsResults = await Promise.all( [
-					axios.get( `/api/stats/${ year }/${ BURPEE_MONTH }/${ day }/global` ),
+					axios.get( `/api/stats/${ year }/${ BURPEE_MONTH }/${ day }/global?region=${ region }` ),
 					axios.get( `/api/stats/${ year }/${ BURPEE_MONTH }/${ day }/regions` ),
-					axios.get( `/api/stats/${ year }/${ BURPEE_MONTH }/${ day }/pax` ),
+					axios.get( `/api/stats/${ year }/${ BURPEE_MONTH }/${ day }/pax?region=${ region }` ),
 				] );
 
 				const globalCounts = statsResults[ 0 ].data;
