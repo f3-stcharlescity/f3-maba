@@ -176,8 +176,18 @@ const postBurpees = async ( req, res ) => {
 module.exports = function ( app ) {
 	app.get( "/api/regions", getRegions );
 	app.get( "/api/hims", getHims );
-	app.post( "/api/hims", postHim );
+	app.post( "/api/hims", ( req, res, next ) => {
+		if ( process.env.USER_CAN_REGISTER === "false" ) {
+			return res.status( 400 ).send( "registration is disabled" );
+		}
+		next();
+	}, postHim );
 	app.get( "/api/hims/:himId/burpees", getBurpees );
-	app.post( "/api/hims/:himId/burpees", postBurpees );
+	app.post( "/api/hims/:himId/burpees", ( req, res, next ) => {
+		if ( process.env.USER_CAN_RECORD_BURPEES === "false" ) {
+			return res.status( 400 ).send( "burpees can no longer be recorded this year" );
+		}
+		next();
+	}, postBurpees );
 	statsAPI( app );
 };
