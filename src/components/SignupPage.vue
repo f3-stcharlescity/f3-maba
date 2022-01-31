@@ -11,7 +11,8 @@
 			<p>The theme is Fall Down. Get back up. Together. We all fall down. We all get back up. We must
 				not do either one alone.</p>
 
-			<p>Sign up below.</p>
+			<p v-if="userCanRegister">Sign up below.</p>
+			<p v-else><strong>Registration is closed for 2022. Come back and join us again in 2023!</strong></p>
 
 			<div class="promo-video centered">
 				<iframe width="560"
@@ -24,7 +25,7 @@
 
 		<section class="subsection">
 			<h2>Region</h2>
-			<p><em>Choose NONE if you are not an F3 member.</em></p>
+			<p v-if="userCanRegister"><em>Choose NONE if you are not an F3 member.</em></p>
 			<select name="regions"
 					v-if="regions.length"
 					:value="selectedRegion"
@@ -38,8 +39,8 @@
 			</select>
 
 			<h2>F3 Name</h2>
-			<p><em>Use your first and last name if you are not an F3 member.</em></p>
-			<div class="f3-name-container">
+			<p v-if="userCanRegister"><em>Use your first and last name if you are not an F3 member.</em></p>
+			<div class="f3-name-container" v-if="userCanRegister">
 				<div>
 					<p v-if="hims.length">
 						<label for="sign-up-option">
@@ -98,6 +99,23 @@
 					</select>
 				</div>
 			</div>
+			<div class="f3-name-container" v-else>
+				<div v-if="hims.length">
+					<select name="hims"
+							:key="hims[ 0 ]?.him_id"
+							:value="selectedHimId"
+							:disabled="!canSelectHim"
+							@change="onAOHimChange"
+					>
+						<option v-for="him in hims"
+								:key="him.him_id"
+								:value="him.him_id"
+								:selected="him.him_id === selectedHimId"
+						>{{ him.f3_name }}
+						</option>
+					</select>
+				</div>
+			</div>
 		</section>
 
 		<section class="subsection" v-if="mergedBurpees.length">
@@ -107,6 +125,7 @@
 				<span>Total: {{ totalBurpees }}</span>
 			</h2>
 			<Burpees :burpees="mergedBurpees"
+					 :disabled="!userCanRecordBurpees"
 					 @change="onBurpeesChanged"
 			/>
 			<p class="centered">
@@ -114,7 +133,7 @@
 			</p>
 		</section>
 
-		<section class="subsection spread buttons">
+		<section class="subsection spread buttons" v-if="userCanRecordBurpees">
 			<div class="buttons--left">
 				<button @click="onSubmitForm">Submit</button>
 			</div>
@@ -139,6 +158,8 @@ export default {
 	},
 	computed: {
 		...mapGetters( "signupPage", [
+			"userCanRegister",
+			"userCanRecordBurpees",
 			"burpeeYear",
 			"validation",
 			"regions",

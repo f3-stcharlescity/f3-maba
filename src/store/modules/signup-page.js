@@ -1,6 +1,7 @@
 import axios from "axios";
 import orderBy from "lodash/orderBy";
 import range from "lodash/range";
+import config from "@/config";
 import { isEmailValid } from "@/lib/validation";
 import { NONE_REGION } from "@/lib/enum";
 import { padZero } from "@/lib/util";
@@ -53,6 +54,8 @@ export default {
 	namespaced: true,
 	state: pristineState(),
 	getters: {
+		userCanRegister: _ => config.USER_CAN_REGISTER,
+		userCanRecordBurpees: _ => config.USER_CAN_RECORD_BURPEES,
 		validation: ( state, getters ) => {
 			const validation = {};
 			if ( !getters.canSelectHim ) {

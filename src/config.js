@@ -1,4 +1,6 @@
 export default {
 	TARGET_YEAR: 2022,
 	TARGET_MONTH: 1,
+	USER_CAN_REGISTER: false,
+	USER_CAN_RECORD_BURPEES: false,
 }

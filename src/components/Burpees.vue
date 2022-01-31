@@ -10,6 +10,7 @@
 				<input type="text"
 					   :class="burpeeCountClasses( burpee )"
 					   :value="burpee.count"
+					   :disabled="disabled"
 					   @input="onCountChange( burpee, $event.target.value )"
 				/>
 
@@ -26,6 +27,7 @@
 				<input type="text"
 					   :class="burpeeCountClasses( burpee )"
 					   :value="burpee.count"
+					   :disabled="disabled"
 					   @input="onCountChange( burpee, $event.target.value )"
 				/>
 
@@ -47,7 +49,11 @@ export default {
 			//
 			type: Array,
 			required: true,
-		}
+		},
+		disabled: {
+			type: Boolean,
+			default: false,
+		},
 	},
 	computed: {
 		formattedBurpees() {
