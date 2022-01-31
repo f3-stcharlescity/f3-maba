@@ -75,7 +75,9 @@ export default {
 		},
 		burpeeYear: state => state.year,
 		regions: state => state.regions,
-		hims: state => state.hims,
+		hims: state => {
+			return orderBy( state.hims, h => h.f3_name.toLowerCase(), [ "asc" ] );
+		},
 		selectedRegion: state => state.selectedRegion,
 		burpees: state => state.burpees,
 		totalBurpees: ( state, getters ) => {
@@ -108,8 +110,18 @@ export default {
 			return selectedHim.f3_name;
 		},
 		himStatus: state => state.himStatus,
-		canSelectHim: state => state.himStatus === HIM_STATUS.EXISTING,
-		canCreateHim: state => state.himStatus === HIM_STATUS.NEW,
+		canSelectHim: state => {
+			if ( !config.USER_CAN_REGISTER ) {
+				return true;
+			}
+			return state.himStatus === HIM_STATUS.EXISTING;
+		},
+		canCreateHim: state => {
+			if ( !config.USER_CAN_REGISTER ) {
+				return false;
+			}
+			return state.himStatus === HIM_STATUS.NEW;
+		},
 		hasEnteredName: state => state.hasEnteredName,
 		hasEnteredEmail: state => state.hasEnteredEmail,
 	},
@@ -128,7 +140,7 @@ export default {
 			localStorage.setItem( "selectedHimId", selectedHimId );
 		},
 		himsFetched( state, hims ) {
-			state.hims = orderBy( hims, [ "f3_name", ], [ "asc", ] );
+			state.hims = hims;
 		},
 		changeName( state, name ) {
 			state.hasEnteredName = true;
@@ -178,7 +190,7 @@ export default {
 					...state.hims.filter( oldHim => oldHim.him_id !== him.him_id ),
 					him,
 				];
-				state.hims = orderBy( hims, [ "f3_name", ], [ "asc", ] );
+				state.hims = hims;
 				localStorage.setItem( "selectedHimId", state.selectedHimId );
 			}
 
@@ -276,7 +288,7 @@ export default {
 			try {
 				let selectedRegion = region;
 				let selectedHimId = "";
-				let burpees = pristineBurpees({year: state.year});
+				let burpees = pristineBurpees( { year: state.year } );
 
 				const himUrl = `/api/hims?region=${ selectedRegion }`;
 				const himResult = await axios.get( himUrl );
@@ -309,7 +321,7 @@ export default {
 		},
 		async changeHimStatus( { state, commit, }, status ) {
 			try {
-				let burpees = pristineBurpees({year: state.year});
+				let burpees = pristineBurpees( { year: state.year } );
 				const { selectedHimId, year, } = state;
 
 				if ( status === HIM_STATUS.EXISTING && selectedHimId ) {

@@ -115,6 +115,7 @@
 						</option>
 					</select>
 				</div>
+				<p v-else>No PAX have registered for this region.</p>
 			</div>
 		</section>
 
