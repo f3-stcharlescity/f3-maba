@@ -177,14 +177,14 @@ module.exports = function ( app ) {
 	app.get( "/api/regions", getRegions );
 	app.get( "/api/hims", getHims );
 	app.post( "/api/hims", ( req, res, next ) => {
-		if ( process.env.USER_CAN_REGISTER === "false" ) {
+		if ( process.env.IS_YEAR_CLOSED === "true" ) {
 			return res.status( 400 ).send( "registration is disabled" );
 		}
 		next();
 	}, postHim );
 	app.get( "/api/hims/:himId/burpees", getBurpees );
 	app.post( "/api/hims/:himId/burpees", ( req, res, next ) => {
-		if ( process.env.USER_CAN_RECORD_BURPEES === "false" ) {
+		if ( process.env.IS_YEAR_CLOSED === "true" ) {
 			return res.status( 400 ).send( "burpees can no longer be recorded this year" );
 		}
 		next();

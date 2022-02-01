@@ -54,8 +54,9 @@ export default {
 	namespaced: true,
 	state: pristineState(),
 	getters: {
-		userCanRegister: _ => config.USER_CAN_REGISTER,
-		userCanRecordBurpees: _ => config.USER_CAN_RECORD_BURPEES,
+		isYearClosed: _ => config.IS_YEAR_CLOSED,
+		userCanRegister: _ => !config.IS_YEAR_CLOSED,
+		userCanRecordBurpees: _ => !config.IS_YEAR_CLOSED,
 		validation: ( state, getters ) => {
 			const validation = {};
 			if ( !getters.canSelectHim ) {
@@ -111,13 +112,13 @@ export default {
 		},
 		himStatus: state => state.himStatus,
 		canSelectHim: state => {
-			if ( !config.USER_CAN_REGISTER ) {
+			if ( config.IS_YEAR_CLOSED ) {
 				return true;
 			}
 			return state.himStatus === HIM_STATUS.EXISTING;
 		},
 		canCreateHim: state => {
-			if ( !config.USER_CAN_REGISTER ) {
+			if ( config.IS_YEAR_CLOSED ) {
 				return false;
 			}
 			return state.himStatus === HIM_STATUS.NEW;
