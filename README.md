@@ -19,7 +19,7 @@ See `schema/ddl.sql`. This app requires a PostgreSQL database.
 
 | Variable       | Description                                           |
 |----------------|-------------------------------------------------------|
-| NODE_ENV       | node.js runtime environment (DEVELOPMENT, PRODUCTION) |
+| NODE_ENV       | node.js runtime environment (development, production) |
 | DATABASE_URL   | PostgreSQL database URL.                              |
 | PORT           | node.js Express server port. Typically 3000.          |
 | TZ             | Server timezone.                                      |
@@ -31,7 +31,7 @@ See `schema/ddl.sql`. This app requires a PostgreSQL database.
 ```
 NODE_ENV=development
 DATABASE_URL=postgresql://USER@HOST:PORT/DATABASE
-PORT=3000
+PORT=3001
 TZ=America/Chicago
 F3_MAP_URL=https://...
 IS_YEAR_CLOSED=false
