@@ -174,6 +174,8 @@ const postBurpees = async ( req, res ) => {
 };
 
 module.exports = function ( app ) {
+	// KEEPME this is the health check route
+	app.get("/fistbump", (req, res) => res.status(200).send());
 	app.get( "/api/regions", getRegions );
 	app.get( "/api/hims", getHims );
 	app.post( "/api/hims", ( req, res, next ) => {
