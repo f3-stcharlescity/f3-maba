@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "@kyvg/vue3-notification": "^2.3.4",
-    "axios": "^0.24.0",
+    "axios": "^0.27.2",
     "body-parser": "^1.19.0",
     "core-js": "^3.6.5",
     "express": "^4.17.1",
@@ -26,10 +26,10 @@
     "vuex": "^4.0.2"
   },
   "devDependencies": {
-    "@vue/cli-plugin-babel": "~4.5.0",
-    "@vue/cli-plugin-eslint": "~4.5.0",
-    "@vue/cli-service": "~4.5.0",
-    "@vue/compiler-sfc": "^3.0.0",
+    "@vue/cli-plugin-babel": "^4.5",
+    "@vue/cli-plugin-eslint": "^4.5",
+    "@vue/cli-service": "^4.5",
+    "@vue/compiler-sfc": "^3.2",
     "babel-eslint": "^10.1.0",
     "eslint": "^6.7.2",
     "eslint-plugin-vue": "^7.0.0",
