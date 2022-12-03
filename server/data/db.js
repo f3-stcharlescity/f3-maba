@@ -1,19 +1,20 @@
+const config = require( "../config" );
 const { Pool } = require( "pg" );
 let pool = null;
 
-const isProduction = process.env.NODE_ENV === "production";
+const isProduction = config.NODE_ENV === "production";
 
 const configuration = () => {
 	if ( isProduction ) {
 		return {
-			connectionString: process.env.DATABASE_URL,
+			connectionString: config.DATABASE_URL,
 			ssl: {
 				rejectUnauthorized: false,
 			},
 		};
 	}
 	return {
-		connectionString: process.env.DATABASE_URL,
+		connectionString: config.DATABASE_URL,
 		ssl: false,
 	};
 };

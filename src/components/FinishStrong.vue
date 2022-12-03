@@ -1,12 +1,12 @@
 <template>
 	<div class="the-end">
 		<div class="img-wrap">
-			<img src="../assets/solo-burpee.png"/>
+			<img src="../assets/solo-burpee.png" alt="Burpees" />
 			<div class="count-container">
-				<img src="../assets/maba-2022-banner-small.png"/>
+				<img src="../assets/maba-banner-small.png" alt="MABA" />
 				<p>Make America Burpee Again</p>
 				<h1 class="burpee-count">{{ formattedGlobalCountrywideCount }}</h1>
-				<p>total burpees in January, 2022</p>
+				<p>total burpees in January, {{ $config.year }}</p>
 				<div>&#9679;</div>
 				<p>
 					<a href="/stats">Daily Stats</a>

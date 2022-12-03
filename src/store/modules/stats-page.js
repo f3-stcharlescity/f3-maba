@@ -1,12 +1,12 @@
 import axios from "axios";
-import moment from "moment-timezone";
+import { DateTime } from "luxon";
+import { padZero } from "@/lib/util";
 import {
 	notifySuccess,
 	notifyInfo,
 	notifyError,
 	notifyUnknownError,
 } from "./notify";
-import { padZero } from "../../lib/util";
 
 const BURPEE_MONTH = "01";
 
@@ -37,7 +37,8 @@ export default {
 			const year = pathParts[ 2 ];
 			const day = pathParts[ 3 ];
 			const date = `${ year }-01-${ padZero( day ) }`;
-			return moment( date ).format( "MMMM Do" );
+			return DateTime.fromFormat( date, "yyyy-MM-dd" )
+				.toFormat("DD" ); // Jan 3, 2022
 		},
 		globalCountrywideCount: state => state.globalCountrywideCount,
 		globalDailyCount: state => state.globalDailyCount,

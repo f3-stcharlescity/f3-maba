@@ -1,7 +1,7 @@
 <template>
 	<MABAForm>
 		<section class="subsection description">
-			<h1>Welcome to Year 2 of MABA — Make America Burpee Again.</h1>
+			<h1>Welcome to Year {{ mabaYear }} of MABA — Make America Burpee Again.</h1>
 
 			<p><strong>The challenge:</strong> Do 3,100 burpees in January. You can do 100 every day, or you can
 				bank a bunch and
@@ -12,8 +12,9 @@
 				not do either one alone.</p>
 
 			<p v-if="userCanRegister">Sign up below.</p>
-			<p v-else><strong>Registration is closed for 2022. Come back and join us again in 2023!</strong></p>
+			<p v-else><strong>Registration is closed for 2023. Come back and join us again in 2024!</strong></p>
 
+			<!--
 			<div class="promo-video centered">
 				<iframe width="560"
 						height="315" src="https://www.youtube.com/embed/5q8mbKXzRZw" title="YouTube video player"
@@ -21,11 +22,12 @@
 						allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
 						allowfullscreen></iframe>
 			</div>
+			-->
 		</section>
 
 		<section class="subsection">
-			<h2>Region</h2>
-			<p v-if="userCanRegister"><em>Choose NONE if you are not an F3 member.</em></p>
+			<h3>Choose your region and F3 name</h3>
+			<p v-if="userCanRegister"><em>If you don't have a region, choose NONE.</em></p>
 			<select name="regions"
 					v-if="regions.length"
 					:value="selectedRegion"
@@ -37,9 +39,10 @@
 				>{{ region }}
 				</option>
 			</select>
-
-			<h2>F3 Name</h2>
+			<!--
+			<h3>Find your F3 name</h3>
 			<p v-if="userCanRegister"><em>Use your first and last name if you are not an F3 member.</em></p>
+			-->
 			<div class="f3-name-container" v-if="userCanRegister">
 				<div>
 					<p v-if="hims.length">
@@ -50,24 +53,26 @@
 								   :checked="canCreateHim"
 								   @input="onHimStatusChange( `NEW` )"
 							/>
-							Sign up
+							I'm new here
 						</label>
 					</p>
 					<p v-else-if="!hims.length">There are no previous registrants for the selected
 						region/AO. Be the first!</p>
 					<input type="text"
-						   placeholder="e.g., dredd"
+						   placeholder="e.g., Banjo"
 						   @input="onNameInput"
 						   :class="nameFieldClasses"
 						   :disabled="!canCreateHim"
 					/>
+					<!--
 					<h3>Email</h3>
 					<input type="text"
-						   placeholder="e.g., dredd@f3nation.com"
+						   placeholder="e.g., banjo@f3thechuck.com"
 						   @input="onEmailInput"
 						   :class="emailFieldClasses"
 						   :disabled="!canCreateHim"
 					/>
+					-->
 				</div>
 				<div v-if="hims.length">
 					<h3>- OR -</h3>
@@ -81,7 +86,7 @@
 								   :checked="canSelectHim"
 								   @input="onHimStatusChange( `EXISTING` )"
 							/>
-							Input new burpees
+							I've already signed up
 						</label>
 					</p>
 					<select name="hims"
@@ -129,18 +134,22 @@
 					 :disabled="!userCanRecordBurpees"
 					 @change="onBurpeesChanged"
 			/>
-			<p class="centered">
-				<a class="daily-stats-link" href="/stats">Daily Stats</a>
+			<p class="stats-links">
+				<a class="daily-stats-link" href="/stats">Today's Stats</a>
+				<a class="daily-stats-link" :href="lastYearStatsLink">This Day Last Year</a>
 			</p>
 		</section>
 
 		<section class="subsection spread buttons" v-if="userCanRecordBurpees">
 			<div class="buttons--left">
-				<button @click="onSubmitForm">Submit</button>
+				<button :disabled="!userCanRecordBurpees" @click="onSubmitForm">Submit</button>
 			</div>
 			<div class="buttons--right">
-				<button @click="onResetBurpees" v-if="hasModifiedBurpees">Reset burpees ONLY</button>
-				<button @click="onResetForm">Reset form</button>
+				<button v-if="hasModifiedBurpees"
+						:disabled="!userCanRecordBurpees"
+						@click="onResetBurpees"
+				>Reset burpees ONLY</button>
+				<button :disabled="!userCanRecordBurpees" @click="onResetForm">Reset form</button>
 			</div>
 		</section>
 	</MABAForm>
@@ -148,6 +157,7 @@
 
 <script>
 import { mapGetters, mapMutations, mapActions } from "vuex";
+import { today } from "@/lib/util";
 import MABAForm from "./MABAForm";
 import Burpees from "./Burpees";
 
@@ -191,6 +201,14 @@ export default {
 			}
 			return emailHasError ? "invalid" : "";
 		},
+		mabaYear() {
+			return this.$config.TARGET_YEAR - 2020;
+		},
+		lastYearStatsLink() {
+			const { year, day, } = today();
+			const lastYear = year - 1;
+			return `/stats/${ lastYear }/${ day }`;
+		}
 	},
 	methods: {
 		...mapMutations( "signupPage", [
@@ -290,6 +308,10 @@ export default {
 	display: flex;
 	flex-direction: column;
 	justify-content: space-between;
+	align-items: center;
+	gap: 0.5rem;
+
+	font-weight: 600;
 
 	@include media-tablet() {
 		flex-direction: row;
@@ -334,6 +356,20 @@ export default {
 		@include media-tablet() {
 			width: 90%;
 		}
+	}
+}
+
+.stats-links {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-evenly;
+	align-items: center;
+	gap: 2rem;
+
+	a {
+		flex: 1;
+		text-align: center;
+		font-weight: 600;
 	}
 }
 </style>

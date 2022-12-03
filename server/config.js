@@ -1,0 +1,18 @@
+const {
+	DATABASE_URL,
+	IS_YEAR_CLOSED,
+	NODE_ENV,
+	PORT,
+	TARGET_YEAR,
+	TZ,
+} = process.env;
+
+module.exports = {
+	DATABASE_URL,
+	IS_YEAR_CLOSED,
+	NODE_ENV,
+	PORT,
+	TZ,
+	TARGET_YEAR,
+	MAINTENANCE_MODE: true,
+};

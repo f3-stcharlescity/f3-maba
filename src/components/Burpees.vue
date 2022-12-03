@@ -37,7 +37,7 @@
 </template>
 
 <script>
-import moment from "moment-timezone";
+import { DateTime } from "luxon";
 
 export default {
 	name: "Burpees",
@@ -60,7 +60,8 @@ export default {
 			return this.burpees.map( burpee => {
 				return {
 					...burpee,
-					formattedDate: moment( burpee.date ).format( "MMM D" )
+					formattedDate: DateTime.fromFormat( burpee.date, "yyyy-MM-dd" )
+						.toFormat( "MMM d" ), // Jan 3
 				};
 			} );
 		},

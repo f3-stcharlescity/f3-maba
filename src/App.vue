@@ -1,10 +1,7 @@
 <template>
-	<!--
-	<div id="nav">
-		<router-link to="/">Home</router-link> |
-		<router-link to="/about">About</router-link>
+	<div class="maintenance" v-if="$config.MAINTENANCE_MODE">
+		ALL DATA WILL BE RESET ON 1/1/2023
 	</div>
-	-->
 	<router-view/>
 	<notifications/>
 </template>
@@ -32,5 +29,17 @@ body {
 	@include media-tablet() {
 		margin-top: 60px;
 	}
+}
+
+.maintenance {
+	position: fixed;
+	top: 0.2rem;
+	left: 0.2rem;
+	right: 0.2rem;
+	padding: 0.5rem;
+
+	background-color: red;
+	color: white;
+	font-weight: 600;
 }
 </style>

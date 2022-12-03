@@ -1,11 +1,13 @@
+const config = require( "../config" );
 const { v4: uuidv4 } = require( "uuid" );
-const moment = require( "moment-timezone" );
+const { DateTime } = require( "luxon" );
 const range = require( "lodash/range" );
 const keyBy = require( "lodash/keyBy" );
 const db = require( "../data/db" );
 const { isEmailValid, isRegionValid } = require( "../validation" );
 const regions = require( "../data/regions" );
 const statsAPI = require( "./stats" );
+const { TARGET_YEAR } = require( "../config" );
 
 //
 // REGIONS
@@ -21,7 +23,6 @@ const getRegions = ( req, res ) => {
 
 const getHims = async ( req, res ) => {
 	const { query, } = req;
-	// console.info({ params, body, query });
 	const { region = "", } = query;
 
 	let sql = [ "select him_id, region, ao, f3_name from hims" ];
@@ -52,12 +53,12 @@ const getHims = async ( req, res ) => {
 };
 
 const postHim = async ( req, res ) => {
-	const { region, f3_name, email } = req.body;
+	const { region, f3_name, email = "" } = req.body;
 
 	if ( !isRegionValid( region ) ) {
 		return res.status( 400 ).send( "Invalid region." );
 	}
-	if ( !isEmailValid( email ) ) {
+	if ( email && !isEmailValid( email ) ) {
 		return res.status( 400 ).send( "Invalid email." );
 	}
 	if ( !f3_name.trim() ) {
@@ -107,7 +108,7 @@ const zeroFillBurpees = ( formattedRows, year ) => {
 
 const getBurpees = async ( req, res ) => {
 	const { himId } = req.params;
-	let { year = moment().year() } = req.query;
+	let { year = TARGET_YEAR } = req.query;
 	year = parseInt( `${ year }`, 10 );
 	const query = "select DATE(date), count from burpees where him_id = $1 and date_part('year', date) = $2 order by date asc;";
 	const values = [ himId, year ];
@@ -121,7 +122,7 @@ const getBurpees = async ( req, res ) => {
 			return {
 				...row,
 				// @see https://node-postgres.com/features/types#date--timestamp--timestamptz
-				date: moment.tz( row.date, process.env.TZ ).format( "YYYY-MM-DD" ),
+				date: DateTime.fromJSDate( row.date ).setZone( config.TZ ).toFormat("yyyy-MM-dd" ),
 			};
 		} );
 
@@ -135,7 +136,7 @@ const getBurpees = async ( req, res ) => {
 
 const postBurpees = async ( req, res ) => {
 	const { himId } = req.params;
-	let { year = moment().year() } = req.query;
+	let { year = config.TARGET_YEAR } = req.query;
 	year = parseInt( `${ year }`, 10 );
 	const allBurpees = req.body || [];
 	const burpees = allBurpees.filter( burpee => burpee.count !== 0 );
@@ -155,13 +156,17 @@ const postBurpees = async ( req, res ) => {
 	const client = await db.getClient();
 
 	try {
+		if (values.length === 0) {
+			return res.status(400).json( new Error("no burpees were submitted") );
+		}
+
 		const insertResult = await client.query( insertQuery, values );
 
 		const formattedRows = insertResult.rows.map( row => {
 			return {
 				...row,
 				// @see https://node-postgres.com/features/types#date--timestamp--timestamptz
-				date: moment.tz( row.date, process.env.TZ ).format( "YYYY-MM-DD" ),
+				date: DateTime.fromJSDate( row.date ).setZone( config.TZ ).toFormat("yyyy-MM-dd" ),
 			};
 		} );
 
@@ -179,14 +184,14 @@ module.exports = function ( app ) {
 	app.get( "/api/regions", getRegions );
 	app.get( "/api/hims", getHims );
 	app.post( "/api/hims", ( req, res, next ) => {
-		if ( process.env.IS_YEAR_CLOSED === "true" ) {
+		if ( config.IS_YEAR_CLOSED === "true" ) {
 			return res.status( 400 ).send( "registration is disabled" );
 		}
 		next();
 	}, postHim );
 	app.get( "/api/hims/:himId/burpees", getBurpees );
 	app.post( "/api/hims/:himId/burpees", ( req, res, next ) => {
-		if ( process.env.IS_YEAR_CLOSED === "true" ) {
+		if ( config.IS_YEAR_CLOSED === "true" ) {
 			return res.status( 400 ).send( "burpees can no longer be recorded this year" );
 		}
 		next();

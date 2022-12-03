@@ -2,7 +2,7 @@
 	<div class="maba-form">
 		<header class="maba-form__header subsection centered">
 			<a href="/signup" class="banner-link">
-				<img src="../assets/maba-2022-banner.png"
+				<img src="../assets/maba-banner.png"
 					 alt="F3 St. Charles | Fitness, Fellowship, and Faith | Established 2021"
 					 class="maba-form__banner"
 				/>
@@ -51,6 +51,11 @@ export default {
 		@include media-tablet() {
 			flex-direction: row;
 		}
+	}
+
+	.subsection .divider {
+		height: 1px;
+		background-color: silver;
 	}
 
 	input, select {

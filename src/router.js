@@ -24,13 +24,16 @@ export default function ( { store } ) {
 		{
 			path: "/signup/:year",
 			name: "signup",
-			component: () => import("../components/SignupPage"),
+			component: () => import("./components/SignupPage"),
 			beforeEnter( to, from, next ) {
 				if ( IS_YEAR_CLOSED ) {
 					return next( `/finish-strong` );
 				}
 				const { params } = to;
-				const { year } = params;
+				let { year } = params;
+				if ( year !== TARGET_YEAR.toString() ) {
+					return next( `/signup/${ TARGET_YEAR }` );
+				}
 				document.title = `MABA - Signup - ${ year }`;
 				store.dispatch( "signupPage/initializeStore", { year, } );
 				next();
@@ -41,6 +44,7 @@ export default function ( { store } ) {
 		//
 		{
 			path: "/stats",
+			component: {},
 			beforeEnter( to, from, next ) {
 				// got to stats for the FIRST of the month
 				let url = `/stats/${ TARGET_YEAR }/01`;
@@ -51,6 +55,9 @@ export default function ( { store } ) {
 				if ( year === TARGET_YEAR && month === TARGET_MONTH ) {
 					// go to stats for TODAY
 					url = `/stats/${ TARGET_YEAR }/${ day }`;
+				} else {
+					console.warn( `cannot show stats for year: ${ year }, month: ${ month }` );
+					url = "/signup";
 				}
 				next( url );
 			}
@@ -58,7 +65,7 @@ export default function ( { store } ) {
 		{
 			path: "/stats/:year/:day",
 			name: "stats",
-			component: () => import("../components/StatsPage"),
+			component: () => import("./components/StatsPage"),
 			beforeEnter( to, from, next ) {
 				const { params } = to;
 				const { year, day, } = params;
@@ -77,7 +84,7 @@ export default function ( { store } ) {
 		{
 			path: "/finish-strong/:year",
 			name: "finish-strong",
-			component: () => import("../components/FinishStrong"),
+			component: () => import("./components/FinishStrong"),
 			beforeEnter( to, from, next ) {
 				if ( !IS_YEAR_CLOSED ) {
 					return next( "/" );

@@ -1,13 +1,14 @@
+const config = require( "./config" );
 const express = require( "express" );
 const bodyParser = require( "body-parser" );
 const path = require( "path" );
 const mountAPI = require( "./api" );
 const db = require( "./data/db" );
 
-const isProductionEnvironment = process.env.NODE_ENV === "production";
+const isProductionEnvironment = config.NODE_ENV === "production";
 
 if ( !isProductionEnvironment ) {
-	console.info( process.env );
+	console.info( config );
 }
 
 const app = express();
@@ -59,5 +60,5 @@ process.on( "SIGINT", async () => {
 // start the app
 ( async () => {
 	await db.setupDB();
-	app.listen( process.env.PORT );
+	app.listen( config.PORT );
 } )();

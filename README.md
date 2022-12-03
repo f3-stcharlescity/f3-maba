@@ -22,8 +22,8 @@ See `schema/ddl.sql`. This app requires a PostgreSQL database.
 | NODE_ENV       | node.js runtime environment (development, production) |
 | DATABASE_URL   | PostgreSQL database URL.                              |
 | PORT           | node.js Express server port. Typically 3000.          |
+| TARGET_YEAR    | MABA year.                                            |
 | TZ             | Server timezone.                                      |
-| F3_MAP_URL     | Used by scripts to fetch region and AO names.         |
 | IS_YEAR_CLOSED | Allow users to submit burpees (true, false)           |
 
 **Example**
@@ -32,8 +32,8 @@ See `schema/ddl.sql`. This app requires a PostgreSQL database.
 NODE_ENV=development
 DATABASE_URL=postgresql://USER@HOST:PORT/DATABASE
 PORT=3001
+TARGET_YEAR=2023
 TZ=America/Chicago
-F3_MAP_URL=https://...
 IS_YEAR_CLOSED=false
 ```
 
@@ -58,11 +58,14 @@ npm run lint
 
 ## Update region names
 
-Region names are stored in `./server/data/regions.json`
+Region names are stored in `./server/data/regions.json`.
 
-```
-node ./bin/make-data.js
-```
+To refresh official region data:
+
+1. Go to https://f3nation.com/workouts/.
+2. In the browser console, find the HTTP request to Google Spreadsheets where the last segment in the URL is `/Points`.
+3. Download the response as `./bin/points.json`.
+4. Execute the `./bin/make-data.js` script to re-generate the `./server/data/regions.json` file.
 
 ## Additional Vue.js customize configuration
 

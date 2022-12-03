@@ -63,7 +63,8 @@ export default {
 				if ( !state.name.trim() ) {
 					validation.name = "Name is required.";
 				}
-				if ( !isEmailValid( state.email.trim() ) ) {
+				const trimmedEmail = state.email.trim();
+				if ( trimmedEmail && !isEmailValid( trimmedEmail ) ) {
 					validation.email = "A valid email is required.";
 				}
 			}

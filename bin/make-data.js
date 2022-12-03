@@ -1,5 +1,6 @@
-const axios = require( "axios" );
+// const axios = require( "axios" );
 const fs = require( "fs" );
+const { readFile } = require("fs/promises");
 const path = require( "path" );
 const uniq = require( "lodash/uniq" );
 const addedRegions = require( "./added-regions.json" );
@@ -8,15 +9,9 @@ const renamedRegions = require( "./renamed-regions.json" );
 const PROJECT_ROOT = path.resolve( __dirname, ".." );
 const DATA_ROOT = path.join( PROJECT_ROOT, "server", "data" );
 
-const f3MapURL = process.env.F3_MAP_URL;
-if ( !f3MapURL ) {
-	console.error( "No map URL supplied." );
-	process.exit( 1 );
-}
-
 async function getMapData() {
-	const response = await axios.get( f3MapURL );
-	return response.data;
+	const mapData = await readFile(path.resolve(__dirname, "points.json"));
+	return JSON.parse( mapData.toString() );
 }
 
 const renameRegions = ( region ) => {
@@ -49,6 +44,7 @@ const trim = str => str.trim();
 
 	console.info( "fetching data..." );
 	const pointsJSON = await getMapData();
+	console.info(pointsJSON)
 
 	const values = pointsJSON.values.slice( 1 );
 

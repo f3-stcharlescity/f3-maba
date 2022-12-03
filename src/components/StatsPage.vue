@@ -1,7 +1,7 @@
 <template>
 	<MABAForm>
 		<section class="subsection" v-if="region">
-			<p class="centered">You are viewing stats for <strong>{{ region }}</strong>. Click <a href="/stats">here</a>
+			<p class="centered">You are viewing stats for <strong>{{ region }} ({{ year }})</strong>. Click <a href="/stats">here</a>
 				to return to the global leader board.</p>
 		</section>
 
@@ -146,6 +146,9 @@ export default {
 			"dailyPaxCounts",
 			"formattedShortDate",
 		] ),
+		year() {
+			return this.$route.params.year;
+		},
 		formattedGlobalAreaName() {
 			return this.region || "Countrywide";
 		},
