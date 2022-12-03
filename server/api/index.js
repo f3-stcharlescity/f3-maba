@@ -156,19 +156,19 @@ const postBurpees = async ( req, res ) => {
 	const client = await db.getClient();
 
 	try {
-		if (values.length === 0) {
-			return res.status(400).json( new Error("no burpees were submitted") );
+		let formattedRows = [];
+
+		if (values.length > 0) {
+			const insertResult = await client.query( insertQuery, values );
+
+			formattedRows = insertResult.rows.map( row => {
+				return {
+					...row,
+					// @see https://node-postgres.com/features/types#date--timestamp--timestamptz
+					date: DateTime.fromJSDate( row.date ).setZone( config.TZ ).toFormat("yyyy-MM-dd" ),
+				};
+			} );
 		}
-
-		const insertResult = await client.query( insertQuery, values );
-
-		const formattedRows = insertResult.rows.map( row => {
-			return {
-				...row,
-				// @see https://node-postgres.com/features/types#date--timestamp--timestamptz
-				date: DateTime.fromJSDate( row.date ).setZone( config.TZ ).toFormat("yyyy-MM-dd" ),
-			};
-		} );
 
 		const allBurpees = zeroFillBurpees( formattedRows, year );
 
