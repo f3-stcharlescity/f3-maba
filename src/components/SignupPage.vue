@@ -57,7 +57,7 @@
 						</label>
 					</p>
 					<p v-else-if="!hims.length">There are no previous registrants for the selected
-						region/AO. Be the first!</p>
+						region. Be the first!</p>
 					<input type="text"
 						   placeholder="e.g., Banjo"
 						   @input="onNameInput"
