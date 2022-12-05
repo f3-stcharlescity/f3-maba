@@ -38,7 +38,7 @@ body {
 	right: 0.2rem;
 	padding: 0.5rem;
 
-	background-color: red;
+	background-color: tomato;
 	color: white;
 	font-weight: 600;
 }

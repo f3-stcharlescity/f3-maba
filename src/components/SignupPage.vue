@@ -39,6 +39,7 @@
 				>{{ region }}
 				</option>
 			</select>
+			<div class="divider region-divider"></div>
 			<!--
 			<h3>Find your F3 name</h3>
 			<p v-if="userCanRegister"><em>Use your first and last name if you are not an F3 member.</em></p>
@@ -75,7 +76,7 @@
 					-->
 				</div>
 				<div v-if="hims.length">
-					<h3>- OR -</h3>
+					<h3 class="middle-or">- OR -</h3>
 				</div>
 				<div v-if="hims.length">
 					<p>
@@ -90,6 +91,7 @@
 						</label>
 					</p>
 					<select name="hims"
+							:class="himsFieldClasses"
 							:key="hims[ 0 ]?.him_id"
 							:value="selectedHimId"
 							:disabled="!canSelectHim"
@@ -188,11 +190,17 @@ export default {
 			"hasModifiedBurpees",
 		] ),
 		nameFieldClasses() {
+			const isActive = this.himStatus === "NEW";
 			const { name: nameHasError, } = this.validation;
+			const klass = `${ isActive ? "him--active" : "" }`;
 			if ( !this.hasEnteredName ) {
-				return "";
+				return klass;
 			}
-			return nameHasError ? "invalid" : "";
+			return `${ klass } ${ nameHasError ? "invalid" : "" }`.trim();
+		},
+		himsFieldClasses() {
+			const isActive = this.himStatus === "EXISTING";
+			return `${ isActive ? "him--active" : "" }`;
 		},
 		emailFieldClasses() {
 			const { email: emailHasError, } = this.validation;
@@ -371,5 +379,31 @@ export default {
 		text-align: center;
 		font-weight: 600;
 	}
+}
+
+[name="regions"] {
+	width: 100%;
+}
+
+.middle-or {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+}
+
+.region-divider {
+	margin: 1rem 0 0 0;
+}
+
+input {
+	&::placeholder {
+		font-style: italic;
+	}
+}
+
+.him--active {
+	border-color: tomato;
+	outline-color: tomato;
 }
 </style>
