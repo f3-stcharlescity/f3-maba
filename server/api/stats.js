@@ -187,8 +187,84 @@ const getPaxStats = async ( req, res ) => {
 	}
 };
 
+const getPacingStats = async (req, res) => {
+	const { year, month, day } = req.params;
+	const { region, } = req.query;
+
+	const client = await db.getClient();
+
+	const params = [ day, year, month ];
+
+	// -- input: year, month, day
+	const globalQuery = `
+	with burpees_by_region as (
+		select
+			100 * $1 as target_count,
+			sum(b.count) as burpee_count,
+			h.region
+		from burpees as b
+			 join hims h on b.him_id = h.him_id
+		where date_part('year', b.date) = $2 and date_part('month', b.date) = $3
+		group by h.region
+	) select
+		bbr.region,
+		bbr.target_count,
+		bbr.burpee_count,
+		floor(bbr.burpee_count::float4 / bbr.target_count::float4 * 100) as pacing_percent
+	from burpees_by_region as bbr;
+	`.trim();
+
+	// -- input: year, month, day, region
+	const regionQuery = `
+	with burpees_by_region as (
+		select
+			100 * $1 as target_count,
+			sum(b.count) as burpee_count,
+			h.f3_name
+		from burpees as b
+			 join hims h on b.him_id = h.him_id
+		where date_part('year', b.date) = $2 and date_part('month', b.date) = $3
+		and region = $4
+		group by h.him_id
+	) select
+		bbr.f3_name,
+		bbr.target_count,
+		bbr.burpee_count,
+		floor(bbr.burpee_count::float4 / bbr.target_count::float4 * 100) as pacing_percent
+	from burpees_by_region as bbr;
+	`.trim();
+
+	try {
+
+		let query = globalQuery;
+		if (region) {
+			query = regionQuery;
+			params.push(region);
+		}
+
+		const pacingResults = await client.query( query, params );
+		const pacing = pacingResults.rows.map( row => {
+			const { region, f3_name } = row;
+			return {
+				region,
+				f3Name: f3_name,
+				targetCount: parseInt( row.target_count, 10 ),
+				burpeeCount: parseInt( row.burpee_count, 10 ),
+				pacingPercent: parseInt( row.pacing_percent, 10 ),
+			};
+		} );
+
+		return res.json( {
+			pacing,
+		} );
+	} finally {
+		client.release( true );
+	}
+};
+
 module.exports = function ( app ) {
 	app.get( "/api/stats/:year/:month/:day/global", getGlobalStats );
 	app.get( "/api/stats/:year/:month/:day/regions", getTopRegionStats );
 	app.get( "/api/stats/:year/:month/:day/pax", getPaxStats );
+	app.get( "/api/stats/:year/:month/:day/pacing", getPacingStats );
 };

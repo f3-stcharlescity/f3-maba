@@ -2,6 +2,7 @@
 node_modules
 /dist
 /bin/points.json
+/.http/
 
 # local env files
 .env.local
