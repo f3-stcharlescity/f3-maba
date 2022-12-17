@@ -2,7 +2,6 @@ const config = require( "./config" );
 const path = require( "path" );
 const express = require( "express" );
 const bodyParser = require( "body-parser" );
-const cors = require( "cors" );
 const mountAPI = require( "./api" );
 const db = require( "./data/db" );
 
@@ -13,10 +12,8 @@ if ( !isProductionEnvironment ) {
 }
 
 const app = express();
-
-app.use( cors( {
-	origin: [ "http://localhost:3001", "https://f3maba.com", ],
-} ) );
+// don't tell them we're using express...
+app.disable( "x-powered-by" );
 
 // TODO: is this still needed on render?
 // @see https://jaketrent.com/post/https-redirect-node-heroku

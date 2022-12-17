@@ -202,9 +202,7 @@ export default {
 			} );
 		},
 		formattedPacingCounts() {
-			console.info(this.pacingCounts);
 			return this.pacingCounts.map(counts => {
-				console.info(counts);
 				return {
 					...counts,
 					paxCount: numeral( counts.paxCount )
