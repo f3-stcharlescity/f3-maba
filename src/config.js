@@ -3,4 +3,9 @@ export default {
 	TARGET_MONTH: 1,
 	IS_YEAR_CLOSED: false,
 	MAINTENANCE_MODE: true,
+
+	// stats
+	ENABLE_REGION_STATS: false,
+	ENABLE_PAX_STATS: false,
+	ENABLE_PACING_STATS: true,
 }

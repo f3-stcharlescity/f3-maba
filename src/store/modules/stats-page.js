@@ -1,5 +1,6 @@
 import axios from "axios";
 import { DateTime } from "luxon";
+import config from "@/config";
 import { padZero } from "@/lib/util";
 import {
 	notifySuccess,
@@ -7,6 +8,12 @@ import {
 	notifyError,
 	notifyUnknownError,
 } from "./notify";
+
+const {
+	ENABLE_REGION_STATS,
+	ENABLE_PAX_STATS,
+	ENABLE_PACING_STATS
+} = config;
 
 const BURPEE_MONTH = "01";
 
@@ -19,6 +26,7 @@ const pristineState = () => {
 		regionCounts: [],
 		topPaxCounts: [],
 		dailyPaxCounts: [],
+		pacingCounts: [],
 		regions: [],
 	};
 };
@@ -45,6 +53,7 @@ export default {
 		regionCounts: state => state.regionCounts,
 		topPaxCounts: state => state.topPaxCounts,
 		dailyPaxCounts: state => state.dailyPaxCounts,
+		pacingCounts: state => state.pacingCounts,
 		regions: state => state.regions,
 	},
 	mutations: {
@@ -56,6 +65,7 @@ export default {
 			regionCounts,
 			topPaxCounts,
 			dailyPaxCounts,
+			pacingCounts,
 			regions,
 		} ) {
 			Object.assign( state, pristineState( { year, day, } ) );
@@ -64,6 +74,7 @@ export default {
 			state.regionCounts = regionCounts;
 			state.topPaxCounts = topPaxCounts;
 			state.dailyPaxCounts = dailyPaxCounts;
+			state.pacingCounts = pacingCounts;
 			state.regions = regions;
 		},
 	},
@@ -73,8 +84,15 @@ export default {
 				const { region } = getters;
 				const statsResults = await Promise.all( [
 					axios.get( `/api/stats/${ year }/${ BURPEE_MONTH }/${ day }/global?region=${ region }` ),
-					axios.get( `/api/stats/${ year }/${ BURPEE_MONTH }/${ day }/regions` ),
-					axios.get( `/api/stats/${ year }/${ BURPEE_MONTH }/${ day }/pax?region=${ region }` ),
+					ENABLE_REGION_STATS ?
+						axios.get( `/api/stats/${ year }/${ BURPEE_MONTH }/${ day }/regions` ) :
+						Promise.resolve( { data: [], } ),
+					ENABLE_PAX_STATS ?
+						axios.get( `/api/stats/${ year }/${ BURPEE_MONTH }/${ day }/pax?region=${ region }` ) :
+						Promise.resolve({ data: { top: [], daily: [], } } ),
+					ENABLE_PACING_STATS ?
+						axios.get( `/api/stats/${ year }/${ BURPEE_MONTH }/${ day }/pacing` ) :
+						Promise.resolve( { data: { pacing: [] } } ),
 					axios.get("/api/regions" ),
 				] );
 
@@ -82,7 +100,8 @@ export default {
 				const regionCounts = statsResults[ 1 ].data;
 				const topPaxCounts = statsResults[ 2 ].data.top;
 				const dailyPaxCounts = statsResults[ 2 ].data.daily;
-				const regions = statsResults[ 3 ].data;
+				const pacingCounts = statsResults[3].data.pacing;
+				const regions = statsResults[ 4 ].data;
 
 				commit( "storeInitialized", {
 					year,
@@ -92,6 +111,7 @@ export default {
 					regionCounts,
 					topPaxCounts,
 					dailyPaxCounts,
+					pacingCounts,
 					regions,
 				} );
 			} catch ( e ) {

@@ -33,7 +33,36 @@
 			</div>
 		</section>
 
-		<section class="subsection" v-if="!region">
+		<section class="subsection pacing-stats-subsection" v-if="$config.ENABLE_PACING_STATS && !region">
+			<h2 class="centered">Region Pacing Leaderboard (Month to Date)</h2>
+			<table class="stat-table pacing-table" v-if="formattedPacingCounts.length">
+				<tr>
+					<th>Region</th>
+					<th># PAX</th>
+					<!-- <th>Burpees</th> -->
+					<th># on pace</th>
+					<th>% on pace</th>
+					<!-- <th>Chart</th> -->
+				</tr>
+				<tr v-for="counts in formattedPacingCounts" :key="counts.region">
+					<td>
+						<!--
+						<a :href="`?region=${ counts.region }`" :title="counts.region">{{ counts.region }}</a>
+						-->
+						{{ counts.region }}
+					</td>
+					<td>{{ counts.paxCount }}</td>
+					<!-- <td>{{ counts.paxBurpeeCount }} / {{ counts.targetBurpeeCount }}</td> -->
+					<td>{{ counts.paxOnPace }}</td>
+					<td>{{ counts.percentPaxOnPace }}</td>
+					<!-- <td>TBD</td> -->
+				</tr>
+			</table>
+			<p class="centered" v-else>No regions have posted burpees yet. Your region's PAX can sign up <a
+				href="/signup">here</a>.</p>
+		</section>
+
+		<section class="subsection" v-if="$config.ENABLE_REGION_STATS && !region">
 			<h2 class="centered">Region Leaderboard (Month to Date)</h2>
 			<table class="stat-table regions-table" v-if="formattedRegionCounts.length">
 				<tr>
@@ -57,7 +86,7 @@
 				href="/signup">here</a>.</p>
 		</section>
 
-		<section class="subsection">
+		<section class="subsection" v-if="$config.ENABLE_PAX_STATS">
 			<h2 class="centered">Top PAX (Month to Date)</h2>
 			<table class="stat-table pax-table" v-if="formattedTopPaxCounts.length">
 				<tr>
@@ -77,7 +106,7 @@
 			</p>
 		</section>
 
-		<section class="subsection">
+		<section class="subsection" v-if="$config.ENABLE_PAX_STATS">
 			<h2 class="centered">Top PAX ({{ formattedShortDate }})</h2>
 			<table class="stat-table pax-table" v-if="formattedDailyPaxCounts.length">
 				<tr>
@@ -97,7 +126,7 @@
 				can sign up <a href="/signup">here</a>.</p>
 		</section>
 
-		<section class="subsection region-leaderboard-section" v-if="!region">
+		<section class="subsection region-leaderboard-section" v-if="$config.ENABLE_REGION_STATS && !region">
 			<select
 				@change="onStatRegionChange"
 			>
@@ -144,6 +173,7 @@ export default {
 			"regionCounts",
 			"topPaxCounts",
 			"dailyPaxCounts",
+			"pacingCounts",
 			"formattedShortDate",
 		] ),
 		year() {
@@ -168,6 +198,24 @@ export default {
 						.format( "0,0" ),
 					daily_burpee_count: numeral( counts.daily_burpee_count )
 						.format( "0,0" ),
+				};
+			} );
+		},
+		formattedPacingCounts() {
+			console.info(this.pacingCounts);
+			return this.pacingCounts.map(counts => {
+				console.info(counts);
+				return {
+					...counts,
+					paxCount: numeral( counts.paxCount )
+						.format( "0,0" ),
+					paxBurpeeCount: numeral( counts.paxBurpeeCount )
+						.format( "0,0" ),
+					targetBurpeeCount: numeral( counts.targetBurpeeCount )
+						.format( "0,0" ),
+					paxOnPace: numeral( counts.paxOnPace )
+						.format( "0,0" ),
+					percentPaxOnPace: `${ counts.percentPaxOnPace }%`
 				};
 			} );
 		},
@@ -281,14 +329,23 @@ export default {
 }
 
 .regions-table {
+	// 4 columns
 	td, th {
 		width: 25%;
 	}
 }
 
 .pax-table {
+	// 3 columns
 	td, th {
 		width: 33%;
+	}
+}
+
+.pacing-table {
+	// 4 columns
+	td, th {
+		width: 25%;
 	}
 }
 

@@ -189,68 +189,47 @@ const getPaxStats = async ( req, res ) => {
 
 const getPacingStats = async (req, res) => {
 	const { year, month, day } = req.params;
-	const { region, } = req.query;
+	const { region, } = req.query; // not supported yet
 
 	const client = await db.getClient();
 
-	const params = [ day, year, month ];
+	const params = [ day, day, year, month, day ];
 
-	// -- input: year, month, day
 	const globalQuery = `
-	with burpees_by_region as (
+	with burpees_by_him as (
 		select
-			100 * $1 as target_count,
 			sum(b.count) as burpee_count,
+			(100 * $1)::float4 as target_count,
+			case when(sum(b.count)::float4 < (100 * $2)::float4) then 0 else 1 end as on_pace, -- 100 * day
+			h.him_id,
 			h.region
 		from burpees as b
 			 join hims h on b.him_id = h.him_id
-		where date_part('year', b.date) = $2 and date_part('month', b.date) = $3
-		group by h.region
-	) select
-		bbr.region,
-		bbr.target_count,
-		bbr.burpee_count,
-		floor(bbr.burpee_count::float4 / bbr.target_count::float4 * 100) as pacing_percent
-	from burpees_by_region as bbr;
-	`.trim();
-
-	// -- input: year, month, day, region
-	const regionQuery = `
-	with burpees_by_region as (
-		select
-			100 * $1 as target_count,
-			sum(b.count) as burpee_count,
-			h.f3_name
-		from burpees as b
-			 join hims h on b.him_id = h.him_id
-		where date_part('year', b.date) = $2 and date_part('month', b.date) = $3
-		and region = $4
+		where date_part('year', b.date) = $3
+			and date_part('month', b.date) = $4
+			and date_part('day', b.date) <= $5
 		group by h.him_id
 	) select
-		bbr.f3_name,
-		bbr.target_count,
-		bbr.burpee_count,
-		floor(bbr.burpee_count::float4 / bbr.target_count::float4 * 100) as pacing_percent
-	from burpees_by_region as bbr;
+		bbh.region,
+		count(bbh.him_id) as pax_count,
+		sum(bbh.burpee_count) as pax_burpee_count,
+		sum(target_count) as target_burpee_count,
+		sum(bbh.on_pace) as pax_on_pace,
+		floor((sum(bbh.on_pace)::float4 / count(bbh.him_id)::float4 * 100)) as percent_pax_on_pace
+	from burpees_by_him as bbh
+	group by bbh.region;
 	`.trim();
 
 	try {
-
-		let query = globalQuery;
-		if (region) {
-			query = regionQuery;
-			params.push(region);
-		}
-
-		const pacingResults = await client.query( query, params );
+		const pacingResults = await client.query( globalQuery, params );
 		const pacing = pacingResults.rows.map( row => {
-			const { region, f3_name } = row;
 			return {
-				region,
-				f3Name: f3_name,
-				targetCount: parseInt( row.target_count, 10 ),
-				burpeeCount: parseInt( row.burpee_count, 10 ),
-				pacingPercent: parseInt( row.pacing_percent, 10 ),
+				region: row.region,
+				paxCount: parseInt( row.pax_count, 10 ),
+				paxBurpeeCount: parseInt(row.pax_burpee_count, 10),
+				targetBurpeeCount: parseInt(row.target_burpee_count, 10),
+				paxOnPace: parseInt( row.pax_on_pace, 10 ),
+				percentPaxOnPace: parseInt( row.percent_pax_on_pace, 10 ),
 			};
 		} );
 
