@@ -138,7 +138,7 @@
 			/>
 			<p class="stats-links">
 				<a class="daily-stats-link" href="/stats">Today's Stats</a>
-				<a class="daily-stats-link" :href="lastYearStatsLink">This Day Last Year</a>
+				<a v-if="$config.ENABLE_REGION_STATS" class="daily-stats-link" :href="lastYearStatsLink">This Day Last Year</a>
 			</p>
 		</section>
 
