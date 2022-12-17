@@ -187,8 +187,63 @@ const getPaxStats = async ( req, res ) => {
 	}
 };
 
+const getPacingStats = async (req, res) => {
+	const { year, month, day } = req.params;
+	const { region, } = req.query; // not supported yet
+
+	const client = await db.getClient();
+
+	const params = [ day, day, year, month, day ];
+
+	const globalQuery = `
+	with burpees_by_him as (
+		select
+			sum(b.count) as burpee_count,
+			(100 * $1)::float4 as target_count,
+			case when(sum(b.count)::float4 < (100 * $2)::float4) then 0 else 1 end as on_pace, -- 100 * day
+			h.him_id,
+			h.region
+		from burpees as b
+			 join hims h on b.him_id = h.him_id
+		where date_part('year', b.date) = $3
+			and date_part('month', b.date) = $4
+			and date_part('day', b.date) <= $5
+		group by h.him_id
+	) select
+		bbh.region,
+		count(bbh.him_id) as pax_count,
+		sum(bbh.burpee_count) as pax_burpee_count,
+		sum(target_count) as target_burpee_count,
+		sum(bbh.on_pace) as pax_on_pace,
+		floor((sum(bbh.on_pace)::float4 / count(bbh.him_id)::float4 * 100)) as percent_pax_on_pace
+	from burpees_by_him as bbh
+	group by bbh.region;
+	`.trim();
+
+	try {
+		const pacingResults = await client.query( globalQuery, params );
+		const pacing = pacingResults.rows.map( row => {
+			return {
+				region: row.region,
+				paxCount: parseInt( row.pax_count, 10 ),
+				paxBurpeeCount: parseInt(row.pax_burpee_count, 10),
+				targetBurpeeCount: parseInt(row.target_burpee_count, 10),
+				paxOnPace: parseInt( row.pax_on_pace, 10 ),
+				percentPaxOnPace: parseInt( row.percent_pax_on_pace, 10 ),
+			};
+		} );
+
+		return res.json( {
+			pacing,
+		} );
+	} finally {
+		client.release( true );
+	}
+};
+
 module.exports = function ( app ) {
 	app.get( "/api/stats/:year/:month/:day/global", getGlobalStats );
 	app.get( "/api/stats/:year/:month/:day/regions", getTopRegionStats );
 	app.get( "/api/stats/:year/:month/:day/pax", getPaxStats );
+	app.get( "/api/stats/:year/:month/:day/pacing", getPacingStats );
 };

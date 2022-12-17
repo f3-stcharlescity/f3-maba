@@ -1,7 +1,8 @@
 const config = require( "./config" );
+const path = require( "path" );
 const express = require( "express" );
 const bodyParser = require( "body-parser" );
-const path = require( "path" );
+const cors = require( "cors" );
 const mountAPI = require( "./api" );
 const db = require( "./data/db" );
 
@@ -13,6 +14,11 @@ if ( !isProductionEnvironment ) {
 
 const app = express();
 
+app.use( cors( {
+	origin: [ "http://localhost:3001", "https://f3maba.com", ],
+} ) );
+
+// TODO: is this still needed on render?
 // @see https://jaketrent.com/post/https-redirect-node-heroku
 if ( isProductionEnvironment ) {
 	app.use( ( req, res, next ) => {
