@@ -23,6 +23,7 @@
 						allowfullscreen></iframe>
 			</div>
 			-->
+			<p class="centered"><strong>Pre-order your <a href="https://f3.mudgear.com/products/f3-st-charles-make-america-burpee-again-pre-order-december-2022" target="_blank">2023 MABA gear</a> from Mudgear before January 4th!</strong></p>
 		</section>
 
 		<section class="subsection">
