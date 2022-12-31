@@ -23,7 +23,18 @@
 						allowfullscreen></iframe>
 			</div>
 			-->
-			<p class="centered"><strong>Pre-order your <a href="https://f3.mudgear.com/products/f3-st-charles-make-america-burpee-again-pre-order-december-2022" target="_blank">2023 MABA gear</a> from Mudgear before January 4th!</strong></p>
+
+			<div class="divider signup-divider"></div>
+
+			<p class="centered">Pre-order your
+				<strong>
+					<a href="https://f3.mudgear.com/products/f3-st-charles-make-america-burpee-again-pre-order-december-2022" target="_blank">2023 MABA gear</a>
+				</strong> from Mudgear before January 11th.
+			</p>
+
+			<p class="centered">
+				Subscribe to the MABA newsletter <strong><a href="https://mattcrossman.substack.com/" target="_blank">here</a>.</strong>
+			</p>
 		</section>
 
 		<section class="subsection">
@@ -40,7 +51,7 @@
 				>{{ region }}
 				</option>
 			</select>
-			<div class="divider region-divider"></div>
+			<div class="divider signup-divider"></div>
 			<!--
 			<h3>Find your F3 name</h3>
 			<p v-if="userCanRegister"><em>Use your first and last name if you are not an F3 member.</em></p>
@@ -393,7 +404,7 @@ export default {
 	align-items: center;
 }
 
-.region-divider {
+.signup-divider {
 	margin: 1rem 0 0 0;
 }
 
