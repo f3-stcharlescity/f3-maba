@@ -1,4 +1,3 @@
-// const axios = require( "axios" );
 const fs = require( "fs" );
 const { readFile } = require("fs/promises");
 const path = require( "path" );
