@@ -14,5 +14,5 @@ module.exports = {
 	PORT,
 	TZ,
 	TARGET_YEAR,
-	MAINTENANCE_MODE: true,
+	MAINTENANCE_MODE: false,
 };
