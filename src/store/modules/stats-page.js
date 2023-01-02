@@ -1,5 +1,6 @@
 import axios from "axios";
 import { DateTime } from "luxon";
+import orderBy from "lodash/orderBy";
 import config from "@/config";
 import { padZero } from "@/lib/util";
 import {
@@ -53,7 +54,10 @@ export default {
 		regionCounts: state => state.regionCounts,
 		topPaxCounts: state => state.topPaxCounts,
 		dailyPaxCounts: state => state.dailyPaxCounts,
-		pacingCounts: state => state.pacingCounts,
+		pacingCounts: state => {
+			const { pacingCounts } = state;
+			return orderBy( pacingCounts, [ "paxBurpeeCount", "region", ], [ "desc", "asc", ] );
+		},
 		regions: state => state.regions,
 	},
 	mutations: {

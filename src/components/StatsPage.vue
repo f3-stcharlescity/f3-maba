@@ -37,14 +37,15 @@
 			<h2 class="centered">Region Pacing Leaderboard (Month to Date)</h2>
 			<table class="stat-table pacing-table" v-if="formattedPacingCounts.length">
 				<tr>
+					<th></th>
 					<th>Region</th>
 					<th># PAX</th>
-					<!-- <th>Burpees</th> -->
-					<th># on pace</th>
-					<th>% on pace</th>
+					<th>Burpees*</th>
+					<th>On Pace</th>
 					<!-- <th>Chart</th> -->
 				</tr>
-				<tr v-for="counts in formattedPacingCounts" :key="counts.region">
+				<tr v-for="( counts, index ) in formattedPacingCounts" :key="counts.region">
+					<td>#{{ index + 1 }} </td>
 					<td>
 						<!--
 						<a :href="`?region=${ counts.region }`" :title="counts.region">{{ counts.region }}</a>
@@ -52,12 +53,14 @@
 						{{ counts.region }}
 					</td>
 					<td>{{ counts.paxCount }}</td>
-					<!-- <td>{{ counts.paxBurpeeCount }} / {{ counts.targetBurpeeCount }}</td> -->
-					<td>{{ counts.paxOnPace }}</td>
-					<td>{{ counts.percentPaxOnPace }}</td>
+					<td>{{ counts.paxBurpeeCount }} / {{ counts.targetBurpeeCount }}</td>
+					<td>{{ counts.paxOnPace }} ({{ counts.percentPaxOnPace }})</td>
 					<!-- <td>TBD</td> -->
 				</tr>
 			</table>
+			<p v-if="formattedPacingCounts.length">
+				<small>* <code>Burpees = (combined MTD PAX burpee count) / (target MTD burpee count * number of PAX)</code></small>
+			</p>
 			<p class="centered" v-else>No regions have posted burpees yet. Your region's PAX can sign up <a
 				href="/signup">here</a>.</p>
 		</section>
@@ -341,9 +344,13 @@ export default {
 }
 
 .pacing-table {
-	// 4 columns
+	// 5 columns
 	td, th {
-		width: 25%;
+		width: 22.5%;
+
+		&:first-of-type {
+			width: 10%;
+		}
 	}
 }
 
