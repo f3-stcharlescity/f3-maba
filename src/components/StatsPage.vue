@@ -344,12 +344,24 @@ export default {
 }
 
 .pacing-table {
-	// 5 columns
+	// 4 columns
 	td, th {
-		width: 22.5%;
+		width: 20%;
 
 		&:first-of-type {
-			width: 10%;
+			display: none;
+		}
+	}
+
+	@include media-tablet() {
+		// 5 columns
+		td, th {
+			width: 22.5%;
+
+			&:first-of-type {
+				display: table-cell;
+				width: 10%;
+			}
 		}
 	}
 }
