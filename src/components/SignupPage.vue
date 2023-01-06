@@ -39,7 +39,7 @@
 
 		<section class="subsection">
 			<h3>Choose your region and F3 name</h3>
-			<p v-if="userCanRegister"><em>If you don't have a region, choose NONE.</em></p>
+			<p v-if="userCanRegister">Don't see your region? <strong><a href="mailto:f3maba.ivx8k@simplelogin.com">Email a request</a></strong> to add it. If you don't have a region, choose <strong>NONE</strong>.</p>
 			<select name="regions"
 					v-if="regions.length"
 					:value="selectedRegion"
