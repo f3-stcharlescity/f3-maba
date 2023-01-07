@@ -4,7 +4,7 @@ import range from "lodash/range";
 import config from "@/config";
 import { isEmailValid } from "@/lib/validation";
 import { NONE_REGION } from "@/lib/enum";
-import { padZero } from "@/lib/util";
+import { padZero, today, } from "@/lib/util";
 import { notifyError, notifyInfo, notifySuccess, notifyUnknownError, } from "./notify";
 
 const HIM_STATUS = {
@@ -86,6 +86,10 @@ export default {
 			return getters.mergedBurpees.reduce( ( total, burpee ) => {
 				return total + burpee.count;
 			}, 0 );
+		},
+		mtdTargetBurpees: _ => {
+			const { day } = today();
+			return day * 100;
 		},
 		mergedBurpees: state => {
 			return state.burpees.map( burpee => {

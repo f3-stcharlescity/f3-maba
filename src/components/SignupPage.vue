@@ -142,7 +142,7 @@
 			<h2 class="burpees-heading">
 				<span v-if="himName">{{ burpeeYear }} Burpees for {{ himName }}</span>
 				<span v-else>{{ burpeeYear }} Burpees</span>
-				<span>Total: {{ totalBurpees }}</span>
+				<span>Total: {{ totalBurpees }} / {{ mtdTargetBurpees }}</span>
 			</h2>
 			<Burpees :burpees="mergedBurpees"
 					 :disabled="!userCanRecordBurpees"
@@ -200,6 +200,7 @@ export default {
 			"selectedRegion",
 			"himName",
 			"hasModifiedBurpees",
+			"mtdTargetBurpees",
 		] ),
 		nameFieldClasses() {
 			const isActive = this.himStatus === "NEW";
