@@ -153,7 +153,7 @@
 </template>
 
 <script>
-import { mapGetters, mapMutations, mapActions } from "vuex";
+import { mapGetters } from "vuex";
 import numeral from "numeral";
 import MABAForm from "./MABAForm";
 
@@ -186,7 +186,7 @@ export default {
 			return this.region || "Countrywide";
 		},
 		formattedGlobalCountrywideCount() {
-			const abbreviation = this.globalCountrywideCount < 1000 ? "0,0" : "0,0.0a";
+			const abbreviation = this.globalCountrywideCount < 1000 ? "0,0" : "0,0.00a";
 			return numeral( this.globalCountrywideCount ).format( abbreviation );
 		},
 		formattedGlobalDailyCount() {
