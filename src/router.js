@@ -49,7 +49,7 @@ export default function ( { store } ) {
 				// got to stats for the FIRST of the month
 				let url = `/stats/${ TARGET_YEAR }/01`;
 				if ( IS_YEAR_CLOSED ) {
-					url = `/stats/${ TARGET_YEAR }/31`;
+					return next( `/stats/${ TARGET_YEAR }/31` );
 				}
 				const { year, month, day } = today();
 				if ( year === TARGET_YEAR && month === TARGET_MONTH ) {

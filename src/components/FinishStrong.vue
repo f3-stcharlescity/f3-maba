@@ -6,7 +6,7 @@
 				<img src="../assets/maba-banner-small.png" alt="MABA" />
 				<p>Make America Burpee Again</p>
 				<h1 class="burpee-count">{{ formattedGlobalCountrywideCount }}</h1>
-				<p>total burpees in January, {{ $config.year }}</p>
+				<p>total burpees in January, {{ $config.TARGET_YEAR }}</p>
 				<div>&#9679;</div>
 				<p>
 					<a href="/stats">Daily Stats</a>
