@@ -2,7 +2,7 @@
 
 ## Prerequisites
 
-- [node.js](https://nodejs.org) (10.16+)
+- [node.js](https://nodejs.org) (16.18+)
 - [Vue3 CLI](https://cli.vuejs.org)
 
 ## Install dependencies
