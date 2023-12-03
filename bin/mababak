@@ -1,0 +1,10 @@
+#!/bin/bash
+source ./.env.prod
+echo $(date)
+NOW_TS=$(date +%Y%m%d_%H%M%S)
+FILENAME="$F3_MABA_BACKUP_PATH/f3_maba_db@$NOW_TS.sql"
+
+echo "backing up to $FILENAME..."
+
+/usr/bin/pg_dump --dbname="$F3_MABA_DATABASE_NAME" --inserts --file="$FILENAME" --username="$F3_MABA_DATABASE_USER" --host="$F3_MABA_DATABASE_HOST" --port="$F3_MABA_DATABASE_PORT" --no-password
+

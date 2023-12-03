@@ -1,6 +1,6 @@
 <template>
 	<div class="maintenance" v-if="$config.MAINTENANCE_MODE">
-		BURPEE DATA WILL BE RESET ON 1/1/2023
+		BURPEE DATA WILL BE RESET ON 1/1/{{ $config.TARGET_YEAR }}
 	</div>
 	<router-view/>
 	<notifications/>

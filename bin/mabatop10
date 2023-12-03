@@ -1,0 +1,4 @@
+#!/bin/bash
+source ./.env.prod
+echo $(date)
+psql -h "$F3_MABA_DATABASE_HOST" -U "$F3_MABA_DATABASE_USER" -d "$F3_MABA_DATABASE_NAME" -f ./mabatop10.sql

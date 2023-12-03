@@ -32,9 +32,10 @@ See `schema/ddl.sql`. This app requires a PostgreSQL database.
 NODE_ENV=development
 DATABASE_URL=postgresql://USER@HOST:PORT/DATABASE
 PORT=3001
-TARGET_YEAR=2023
+TARGET_YEAR=2024
 TZ=America/Chicago
 IS_YEAR_CLOSED=false
+MAINTENANCE_MODE=false
 ```
 
 ## Start the dev server and UI compilation watch
@@ -66,6 +67,14 @@ To refresh official region data:
 2. In the browser console, find the HTTP request to Google Spreadsheets where the last segment in the URL is `/Points`.
 3. Download the response as `./bin/points.json`.
 4. Execute the `./bin/make-data.js` script to re-generate the `./server/data/regions.json` file.
+
+## Running maintenance scripts
+
+**NOTE: the production database password must be stored in a standard ~/.pgpass file for maintenance scripts to function.**
+
+- `bin/.env.prod`: environment variables for maintenance scripts (see: `bin/.env.prod.example`)
+- `bin/mababak`: perform a backup of the production database
+- `bin/mabatop10`: get quick "top 10" stats from the production database (see: `bin/mabatop10.sql`)
 
 ## Additional Vue.js customize configuration
 

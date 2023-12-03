@@ -5,6 +5,7 @@ const {
 	PORT,
 	TARGET_YEAR,
 	TZ,
+	MAINTENANCE_MODE,
 } = process.env;
 
 module.exports = {
@@ -14,5 +15,5 @@ module.exports = {
 	PORT,
 	TZ,
 	TARGET_YEAR,
-	MAINTENANCE_MODE: false,
+	MAINTENANCE_MODE,
 };
