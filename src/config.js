@@ -5,7 +5,7 @@ export default {
 	MAINTENANCE_MODE: true,
 
 	// stats
-	ENABLE_REGION_STATS: false,
-	ENABLE_PAX_STATS: false,
+	ENABLE_REGION_STATS: true,
+	ENABLE_PAX_STATS: true,
 	ENABLE_PACING_STATS: true,
 }
