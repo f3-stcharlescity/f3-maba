@@ -28,7 +28,7 @@
 
 			<p class="centered">Pre-order your
 				<strong>
-					<a href="https://f3.mudgear.com/products/f3-st-charles-make-america-burpee-again-pre-order-december-2022" target="_blank">{{ $config.TARGET_YEAR }} MABA gear</a>
+					<a href="https://f3.mudgear.com/products/f3-st-charles-make-america-burpee-again-pre-order-december-2023" target="_blank">{{ $config.TARGET_YEAR }} MABA gear</a>
 				</strong> from Mudgear before January 11th.
 			</p>
 
