@@ -65,7 +65,11 @@ const trim = str => str.trim();
 			return process.exit( 1 );
 		}
 		const regions = Object.keys( allAOs );
-		const adjustedRegions = uniq( regions.concat( addedRegions ).map( renameRegions ) ).map( trim ).sort();
+		const adjustedRegions = uniq( regions.concat( addedRegions )
+			.map( renameRegions ) )
+			.map( trim ).sort((a, b) => {
+				return a.toLowerCase().localeCompare(b.toLowerCase());
+			});
 		console.info( "writing regions..." );
 		fs.writeFile( path.join( DATA_ROOT, "regions.json" ), JSON.stringify( adjustedRegions ), ( err ) => {
 			if ( err ) {
