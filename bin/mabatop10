@@ -1,4 +1,14 @@
 #!/bin/bash
+cd "$(dirname "$0")"
 source ./.env.prod
 echo $(date)
-psql -h "$F3_MABA_DATABASE_HOST" -U "$F3_MABA_DATABASE_USER" -d "$F3_MABA_DATABASE_NAME" -f ./mabatop10.sql
+NOW_TS=$(date +%Y%m%d)
+FILENAME="$F3_MABA_BACKUP_PATH/f3_maba_top10regions@$NOW_TS.txt"
+
+echo "writing top 10 to $FILENAME..."
+
+psql -h "$F3_MABA_DATABASE_HOST" \
+-U "$F3_MABA_DATABASE_USER" \
+-d "$F3_MABA_DATABASE_NAME" \
+-f ./mabatop10.sql \
+> >(tee "$FILENAME") 2> >(tee "$FILENAME.err" >&2)
