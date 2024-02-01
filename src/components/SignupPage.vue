@@ -226,9 +226,13 @@ export default {
 			return this.$config.TARGET_YEAR - 2020;
 		},
 		lastYearStatsLink() {
-			const { year, day, } = today();
+			const { year, day, month } = today();
 			const lastYear = year - 1;
-			return `/stats/${ lastYear }/${ day }`;
+			let targetDay = day;
+			if (month !== this.$config.TARGET_MONTH) {
+				targetDay = 31;
+			}
+			return `/stats/${ lastYear }/${ targetDay }`;
 		}
 	},
 	methods: {
