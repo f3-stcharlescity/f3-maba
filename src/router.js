@@ -54,7 +54,9 @@ export default function ( { store } ) {
 				const { year, month, day } = today();
 				if ( year === TARGET_YEAR && month === TARGET_MONTH ) {
 					// go to stats for TODAY
-					url = `/stats/${ TARGET_YEAR }/${ day }`;
+					url = `/stats/${TARGET_YEAR}/${day}`;
+				} else if (year === TARGET_YEAR && month !== TARGET_MONTH) {
+					url = `/stats/${TARGET_YEAR}/31`;
 				} else {
 					console.warn( `cannot show stats for year: ${ year }, month: ${ month }` );
 					url = "/signup";
