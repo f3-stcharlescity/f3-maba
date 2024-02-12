@@ -1,7 +1,7 @@
 export default {
 	TARGET_YEAR: 2024,
 	TARGET_MONTH: 1,
-	IS_YEAR_CLOSED: false,
+	IS_YEAR_CLOSED: true,
 	MAINTENANCE_MODE: false,
 
 	// stats
