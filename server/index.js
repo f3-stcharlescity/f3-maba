@@ -64,9 +64,6 @@ process.on("SIGINT", async () => {
 
 // start the app
 (async () => {
-  // NOTE: disabling DB connection as a static page is now
-  // being served until the site migration is complete for MABA '25.
-  // Once that is finished this can be uncommented.
-  // await db.setupDB();
+  await db.setupDB();
   app.listen(config.PORT);
 })();

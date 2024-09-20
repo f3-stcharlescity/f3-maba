@@ -99,15 +99,14 @@ export default function ({ store }) {
 
   return createRouter({
     history: createWebHistory(),
-    // routes,
+    routes,
     // NOTE: overriding routes here so that the static "finish strong"
-    // is always displayed. This can be removed once the site migration
-    // is finished for MABA '25
-    routes: [
-      {
-        path: "/:catchAll(.*)*",
-        component: () => import("./components/FinishStrongStatic"),
-      },
-    ],
+    // is always displayed.
+    // routes: [
+    //   {
+    //     path: "/:catchAll(.*)*",
+    //     component: () => import("./components/FinishStrongStatic"),
+    //   },
+    // ],
   });
 }
